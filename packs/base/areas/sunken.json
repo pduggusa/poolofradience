@@ -1,0 +1,41 @@
+{
+  "id": "sunken",
+  "name": "The Sunken Crypt",
+  "start": "entry",
+  "rooms": [
+    {
+      "id": "entry",
+      "name": "Flooded Entry",
+      "description": "Knee-deep black water laps at the walls. Bones shift underfoot. Daylight is a pale smear above you.",
+      "exits": {
+        "u": "mossgate/crypt_steps",
+        "e": "hall"
+      },
+      "spawns": [
+        {
+          "monster": "bone_walker",
+          "count": 1
+        }
+      ],
+      "items": [
+        "scroll_frost_lance"
+      ],
+      "theme": "crypt"
+    },
+    {
+      "id": "hall",
+      "name": "Hall of Lanterns",
+      "description": "Dead lanterns hang from chains. At the far end, a pale light hovers where no light should be.",
+      "exits": {
+        "w": "entry"
+      },
+      "spawns": [
+        {
+          "monster": "lantern_wraith",
+          "count": 1
+        }
+      ],
+      "theme": "crypt"
+    }
+  ]
+}

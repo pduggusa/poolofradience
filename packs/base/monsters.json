@@ -1,0 +1,218 @@
+{
+  "monsters": [
+    {
+      "id": "bone_walker",
+      "name": "Bone Walker",
+      "description": "A shambling skeleton animated by stale magic. Slow, tireless, and brittle.",
+      "ac": 7,
+      "hitDice": 1,
+      "move": 6,
+      "attacks": [
+        {
+          "name": "rusty blade",
+          "damage": "1d6"
+        }
+      ],
+      "xp": 15,
+      "morale": 12,
+      "tags": [
+        "undead"
+      ],
+      "gold": "1d6",
+      "loot": [
+        {
+          "item": "bone_dagger",
+          "chance": 0.2
+        },
+        {
+          "item": "tattered_gloves",
+          "chance": 0.25
+        }
+      ],
+      "sprite": "bone_walker"
+    },
+    {
+      "id": "crypt_rat",
+      "name": "Crypt Rat",
+      "description": "Dog-sized vermin that nest among the bones. They swarm anything warm.",
+      "ac": 7,
+      "hitDice": 1,
+      "hpBonus": -1,
+      "move": 12,
+      "attacks": [
+        {
+          "name": "bite",
+          "damage": "1d3"
+        }
+      ],
+      "xp": 5,
+      "morale": 6,
+      "tags": [
+        "beast"
+      ],
+      "gold": "1d4",
+      "loot": [
+        {
+          "item": "dried_sausage",
+          "chance": 0.1
+        }
+      ],
+      "sprite": "crypt_rat"
+    },
+    {
+      "id": "lantern_wraith",
+      "name": "Lantern Wraith",
+      "description": "A pale light drifting above a robed shape. It guards the crypt's deepest seal.",
+      "ac": 4,
+      "hitDice": 4,
+      "move": 9,
+      "attacks": [
+        {
+          "name": "chilling touch",
+          "damage": "1d8",
+          "toHitBonus": 1
+        }
+      ],
+      "xp": 120,
+      "morale": 10,
+      "tags": [
+        "undead",
+        "boss"
+      ],
+      "gold": "5d10",
+      "loot": [
+        {
+          "item": "lantern_shard",
+          "chance": 1.0
+        },
+        {
+          "item": "wraith_boots",
+          "chance": 0.35
+        }
+      ],
+      "sprite": "lantern_wraith"
+    },
+    {
+      "id": "loot_goblin",
+      "name": "Loot Goblin",
+      "description": "Hauls a sack three times its size and is deeply offended that you looked at it. It has been farming this cellar for eleven years and has opinions about your build.",
+      "ac": 6,
+      "hitDice": 1,
+      "move": 12,
+      "attacks": [
+        {
+          "name": "passive-aggressive whisper",
+          "damage": "1d4"
+        }
+      ],
+      "xp": 10,
+      "morale": 5,
+      "tags": [
+        "goblin",
+        "whiny"
+      ],
+      "gold": "2d6",
+      "loot": [
+        {
+          "item": "goblin_ledger",
+          "chance": 0.4
+        },
+        {
+          "item": "healing_draught",
+          "chance": 0.2
+        }
+      ],
+      "sprite": "loot_goblin"
+    },
+    {
+      "id": "guild_recruiter",
+      "name": "Guild Recruiter",
+      "description": "Stands in the doorway shouting about a 'casual-friendly, hardcore-progression' guild. Has not stopped talking since the cellar was dug.",
+      "ac": 9,
+      "hitDice": 2,
+      "move": 6,
+      "attacks": [
+        {
+          "name": "unsolicited invite",
+          "damage": "1d6"
+        }
+      ],
+      "xp": 25,
+      "morale": 12,
+      "tags": [
+        "humanoid",
+        "spammer"
+      ],
+      "gold": "1d8",
+      "loot": [
+        {
+          "item": "recruiter_pamphlet",
+          "chance": 0.9
+        },
+        {
+          "item": "travel_bread",
+          "chance": 0.3
+        }
+      ],
+      "sprite": "guild_recruiter"
+    },
+    {
+      "id": "mimic_barrel",
+      "name": "Barrel (Allegedly)",
+      "description": "It is a barrel. It has always been a barrel. Please stop poking it. It bites.",
+      "ac": 5,
+      "hitDice": 3,
+      "move": 3,
+      "attacks": [
+        {
+          "name": "stave",
+          "damage": "2d4"
+        }
+      ],
+      "xp": 60,
+      "morale": 12,
+      "tags": [
+        "mimic"
+      ],
+      "gold": "2d8",
+      "loot": [
+        {
+          "item": "stave_club",
+          "chance": 0.3
+        },
+        {
+          "item": "ale",
+          "chance": 0.5
+        }
+      ],
+      "sprite": "barrel_mimic"
+    },
+    {
+      "id": "dire_chicken",
+      "name": "Dire Chicken of Mild Inconvenience",
+      "description": "Not dangerous, exactly. Just there. Always there. Following you from room to room, making a sound like a creaky door.",
+      "ac": 8,
+      "hitDice": 1,
+      "hpBonus": 2,
+      "move": 9,
+      "attacks": [
+        {
+          "name": "peck",
+          "damage": "1d2"
+        }
+      ],
+      "xp": 8,
+      "morale": 3,
+      "tags": [
+        "beast"
+      ],
+      "loot": [
+        {
+          "item": "chicken_feather",
+          "chance": 0.7
+        }
+      ],
+      "sprite": "dire_chicken"
+    }
+  ]
+}

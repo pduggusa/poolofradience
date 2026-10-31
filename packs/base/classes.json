@@ -1,0 +1,51 @@
+{
+  "classes": [
+    {
+      "id": "warrior",
+      "name": "Warrior",
+      "description": "Strong, hard to kill, improves at hitting things fastest. Little magic.",
+      "hp": {
+        "base": 14,
+        "perLevel": 8
+      },
+      "mana": {
+        "base": 2,
+        "perLevel": 1
+      },
+      "attackRate": 1.0,
+      "startItems": [
+        "rusty_sword"
+      ]
+    },
+    {
+      "id": "cleric",
+      "name": "Cleric",
+      "description": "Sturdy healer and smiter. Decent in a fight, better with a prayer.",
+      "hp": {
+        "base": 12,
+        "perLevel": 6
+      },
+      "mana": {
+        "base": 5,
+        "perLevel": 3
+      },
+      "attackRate": 0.75,
+      "startItems": []
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "description": "Fragile, clumsy in melee, with the deepest well of mana and the loudest spells.",
+      "hp": {
+        "base": 8,
+        "perLevel": 4
+      },
+      "mana": {
+        "base": 7,
+        "perLevel": 4
+      },
+      "attackRate": 0.5,
+      "startItems": []
+    }
+  ]
+}

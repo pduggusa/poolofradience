@@ -1,0 +1,41 @@
+{
+  "id": "base",
+  "name": "Base Game",
+  "version": "0.1.0",
+  "engine": "0.1.0",
+  "monsters": [
+    "monsters.json"
+  ],
+  "dungeons": [
+    "dungeons/sunken_crypt.json"
+  ],
+  "areas": [
+    "areas/mossgate.json",
+    "areas/sunken.json",
+    "areas/cellar.json"
+  ],
+  "glossary": [
+    "glossary.json"
+  ],
+  "items": [
+    "items.json"
+  ],
+  "quests": [
+    "quests.json"
+  ],
+  "spells": [
+    "spells.json"
+  ],
+  "classes": [
+    "classes.json"
+  ],
+  "races": [
+    "races.json"
+  ],
+  "books": [
+    "books.json"
+  ],
+  "art": [
+    "art.json"
+  ]
+}

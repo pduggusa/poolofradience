@@ -1,0 +1,27 @@
+{
+  "races": [
+    {
+      "id": "human",
+      "name": "Human",
+      "description": "Adaptable and curious. Learns a little faster than anyone else.",
+      "xpRate": 1.1
+    },
+    {
+      "id": "dwarf",
+      "name": "Dwarf",
+      "description": "Tough as a boot and twice as stubborn. Needs food. Badly.",
+      "hpBonus": 4,
+      "hungerRate": 1.6,
+      "carryBonus": 10
+    },
+    {
+      "id": "elf",
+      "name": "Elf",
+      "description": "Slender and attuned to magic. Barely eats; does not hold a grudge about it.",
+      "hpBonus": -2,
+      "manaBonus": 4,
+      "hungerRate": 0.6,
+      "carryBonus": -5
+    }
+  ]
+}

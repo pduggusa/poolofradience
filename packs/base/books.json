@@ -1,0 +1,356 @@
+{
+  "books": [
+    {
+      "id": "door_below_cheese",
+      "name": "The Door Below the Cheese",
+      "start": "start",
+      "passages": [
+        {
+          "id": "start",
+          "text": "Below the Pantry of Respawning Cheese, in a corner no one has swept, there is a door. It is a very small door. It hums.",
+          "choices": [
+            {
+              "text": "Knock politely.",
+              "to": "knock"
+            },
+            {
+              "text": "Try the handle.",
+              "to": "locked"
+            },
+            {
+              "text": "Go back upstairs.",
+              "to": "coward"
+            }
+          ]
+        },
+        {
+          "id": "knock",
+          "text": "A small voice from inside says: \"Password?\"",
+          "choices": [
+            {
+              "text": "Say \"please\".",
+              "to": "please"
+            },
+            {
+              "text": "Say \"cheese\".",
+              "to": "cheese_pw"
+            },
+            {
+              "text": "Say nothing. Stare at the door.",
+              "to": "stare"
+            }
+          ]
+        },
+        {
+          "id": "please",
+          "text": "\"Wrong,\" says the voice, \"but admirably polite.\" The door swings open.",
+          "choices": [
+            {
+              "text": "Step through.",
+              "to": "inside",
+              "set": "polite"
+            }
+          ]
+        },
+        {
+          "id": "cheese_pw",
+          "text": "\"Correct,\" says the voice. \"It was always cheese.\" The door swings open.",
+          "choices": [
+            {
+              "text": "Step through.",
+              "to": "inside"
+            }
+          ]
+        },
+        {
+          "id": "stare",
+          "text": "The voice waits. You wait. Eleven years pass. Somewhere a goblin makes a tally mark.",
+          "end": "lose"
+        },
+        {
+          "id": "locked",
+          "text": "The handle is locked. A tiny keyhole stares back at you, unimpressed.",
+          "choices": [
+            {
+              "text": "Try the ring of suspicious keys.",
+              "to": "keys",
+              "requires": {
+                "item": "cellar_key_ring"
+              }
+            },
+            {
+              "text": "Give up and knock instead.",
+              "to": "knock"
+            },
+            {
+              "text": "Go back upstairs.",
+              "to": "coward"
+            }
+          ]
+        },
+        {
+          "id": "keys",
+          "text": "One of the keys fits. None of them should. The door clicks open.",
+          "choices": [
+            {
+              "text": "Step through.",
+              "to": "inside",
+              "set": "keyed"
+            }
+          ]
+        },
+        {
+          "id": "inside",
+          "text": "Beyond is a tiny library holding exactly one book, titled \"The Door Below the Cheese\". There is also a small chest, and a sign that says THIS ROOM IS NOT CANON.",
+          "choices": [
+            {
+              "text": "Open the chest.",
+              "to": "chest"
+            },
+            {
+              "text": "Read the book (it is this book).",
+              "to": "start"
+            },
+            {
+              "text": "Leave through the door.",
+              "to": "coward"
+            }
+          ]
+        },
+        {
+          "id": "chest",
+          "text": "Inside the chest: a pile of gold, and a note in careful handwriting. \"Well done. Now go touch grass.\"",
+          "end": "win",
+          "reward": {
+            "xp": 80,
+            "gold": 40,
+            "items": [
+              "healing_draught"
+            ]
+          }
+        },
+        {
+          "id": "coward",
+          "text": "You return upstairs. Behind you, the door goes on humming, a little disappointed.",
+          "end": "lose"
+        }
+      ]
+    },
+    {
+      "id": "talk_barkeep",
+      "name": "The Barkeep",
+      "start": "start",
+      "passages": [
+        {
+          "id": "start",
+          "text": "The barkeep doesn't look up from the mug. \"Ale's two gold. Bread's four. Rats are free, and I'd like them gone.\"",
+          "choices": [
+            {
+              "text": "About those rats...",
+              "to": "rats"
+            },
+            {
+              "text": "What's through the trapdoor?",
+              "to": "trapdoor"
+            },
+            {
+              "text": "Nothing. Carry on.",
+              "to": "bye"
+            }
+          ]
+        },
+        {
+          "id": "rats",
+          "text": "\"On the Old Road. Big as dogs now. Bigger every week. Type 'quests' while you're standing in here and I'll make it official.\"",
+          "choices": [
+            {
+              "text": "Anything else?",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "trapdoor",
+          "text": "\"The cellar. Goes down further than the building is tall. Nobody's ever finished counting the stairs. A guild recruiter lives at the bottom. Don't make eye contact.\"",
+          "choices": [
+            {
+              "text": "Anything else?",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "bye",
+          "text": "\"Mm,\" says the barkeep, and goes on polishing.",
+          "end": "done"
+        }
+      ]
+    },
+    {
+      "id": "talk_brenna",
+      "name": "Brenna",
+      "start": "start",
+      "passages": [
+        {
+          "id": "start",
+          "text": "Brenna sets down seven mugs at once, takes a bow nobody asked for, and fixes you with a look that has ended careers. \"Well? I've got forty people to ignore, and you're one of them.\"",
+          "choices": [
+            {
+              "text": "Just an ale, please.",
+              "to": "polite"
+            },
+            {
+              "text": "Compliment her mug-carrying technique.",
+              "to": "posture"
+            },
+            {
+              "text": "Attempt an extremely bad pickup line.",
+              "to": "badline"
+            },
+            {
+              "text": "Never mind.",
+              "to": "bye"
+            }
+          ]
+        },
+        {
+          "id": "polite",
+          "text": "\"Manners! In a tavern!\" She slides a mug in front of you. \"On the house. Don't tell the others. They'll expect it.\"",
+          "end": "done",
+          "reward": {
+            "xp": 5,
+            "gold": 0,
+            "items": [
+              "ale"
+            ]
+          }
+        },
+        {
+          "id": "posture",
+          "text": "\"Years of practice,\" she says, \"and a lot of resentment.\" For a moment she almost smiles.",
+          "choices": [
+            {
+              "text": "Say something else.",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "badline",
+          "text": "\"Is that the best you've got? Last week a man proposed in iambic pentameter. He still got the towel.\" She demonstrates the towel. Your dignity takes 3 damage.",
+          "choices": [
+            {
+              "text": "Recover with something else.",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "bye",
+          "text": "\"Then move,\" says Brenna. \"You're blocking the tips.\"",
+          "end": "done"
+        }
+      ]
+    },
+    {
+      "id": "talk_ozzie",
+      "name": "Ozzie Plumb",
+      "start": "start",
+      "passages": [
+        {
+          "id": "start",
+          "text": "\"Don't,\" says Ozzie Plumb, *hic*, \"look so happy. In an infinite multiverse there's a tavern where this ale is good. This isn't it.\" Beside him, his apprentice Timbles offers an apologetic wave.",
+          "choices": [
+            {
+              "text": "Ask what he's drinking.",
+              "to": "drink"
+            },
+            {
+              "text": "Ask about the infinite taverns.",
+              "to": "infinite"
+            },
+            {
+              "text": "Buy him a drink.",
+              "to": "buy",
+              "requires": {
+                "item": "ale"
+              },
+              "takes": "ale"
+            },
+            {
+              "text": "Ask about the beans in his robe.",
+              "to": "beans"
+            },
+            {
+              "text": "Leave them to it.",
+              "to": "bye"
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "text": "\"Regret,\" says Ozzie, *urp*, \"with a hint of regret.\" Timbles whispers: \"It's just ale. He says that every time.\"",
+          "choices": [
+            {
+              "text": "Say something else.",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "infinite",
+          "text": "\"Every possible tavern. Every possible cellar. Every possible door humming a different tune. I've been to the one where the barrels are in charge. They were fair, honestly.\" Timbles: \"He isn't lying. That's the worst part.\"",
+          "choices": [
+            {
+              "text": "Say something else.",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "buy",
+          "text": "Ozzie accepts the ale with the dignity of a drowning man accepting a rope. \"You're the first person in nine dimensions to do that.\" He presses a dented flask into your hand. \"Don't open it near anything you like.\"",
+          "end": "done",
+          "reward": {
+            "xp": 20,
+            "gold": 0,
+            "items": [
+              "hiccuping_flask"
+            ]
+          }
+        },
+        {
+          "id": "beans",
+          "text": "\"Magic beans,\" says Ozzie, patting his robe. \"Ten for a gold, normally. For you, free, because I'm tired.\" Timbles winces. \"They're beans.\"",
+          "choices": [
+            {
+              "text": "Take the beans.",
+              "to": "beans_done"
+            },
+            {
+              "text": "Decline politely.",
+              "to": "start"
+            }
+          ]
+        },
+        {
+          "id": "beans_done",
+          "text": "You take a small bag of suspiciously ordinary beans. \"Plant them somewhere with a really tall ceiling,\" says Ozzie. *hic*",
+          "end": "done",
+          "reward": {
+            "xp": 0,
+            "gold": 0,
+            "items": [
+              "magic_beans"
+            ]
+          }
+        },
+        {
+          "id": "bye",
+          "text": "\"Go,\" says Ozzie. \"Be somebody else's problem.\" *hic*",
+          "end": "done"
+        }
+      ]
+    }
+  ]
+}

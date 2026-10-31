@@ -1,0 +1,121 @@
+{
+  "id": "mossgate",
+  "name": "Mossgate Village",
+  "start": "square",
+  "rooms": [
+    {
+      "id": "square",
+      "name": "Mossgate Square",
+      "description": "A damp cobbled square ringed by leaning timber houses. A cracked fountain gurgles in the middle. The tavern lies east, a general store west, the old road runs north, a flight of worn steps climbing to the clocktower hall, and a mossy stair descends into the dark to the south. A hedge witch has set up a stall under the fountain, selling lessons in basic magic.",
+      "exits": {
+        "e": "tavern",
+        "n": "road",
+        "s": "crypt_steps",
+        "w": "store",
+        "u": "hall"
+      },
+      "theme": "village"
+    },
+    {
+      "id": "tavern",
+      "name": "The Drowned Lantern",
+      "description": "Smoke, spilled ale, and low voices. A barkeep polishes the same mug he has been polishing for years. A trapdoor behind the bar stands open, with a faint smell of cheese. The barkeep sells food and drink.",
+      "exits": {
+        "w": "square",
+        "d": "cellar/stairs"
+      },
+      "items": [
+        "polished_mug"
+      ],
+      "shop": {
+        "sells": [
+          "travel_bread",
+          "dried_sausage",
+          "ale",
+          "healing_draught"
+        ]
+      },
+      "npcs": [
+        {
+          "id": "barkeep",
+          "name": "The barkeep",
+          "description": "He has been polishing the same mug for years.",
+          "talk": "talk_barkeep",
+          "sprite": "barkeep"
+        },
+        {
+          "id": "brenna",
+          "name": "Brenna the barmaid",
+          "description": "A barmaid of formidable presence and legendary tip-jar discipline.",
+          "talk": "talk_brenna",
+          "sprite": "brenna"
+        },
+        {
+          "id": "ozzie",
+          "name": "Ozzie Plumb",
+          "description": "A sunken-eyed hedge-wizard slumped in the corner, with an anxious young apprentice named Timbles.",
+          "talk": "talk_ozzie",
+          "sprite": "ozzie"
+        }
+      ],
+      "theme": "tavern"
+    },
+    {
+      "id": "road",
+      "name": "The Old Road",
+      "description": "Rutted and overgrown, the road bends away into pine forest. Something rustles in the ditch.",
+      "exits": {
+        "s": "square"
+      },
+      "spawns": [
+        {
+          "monster": "crypt_rat",
+          "count": 3
+        }
+      ],
+      "theme": "road"
+    },
+    {
+      "id": "crypt_steps",
+      "name": "Crypt Steps",
+      "description": "Worn steps lead down into a flooded passage that smells of old stone and older water.",
+      "exits": {
+        "n": "square",
+        "d": "sunken/entry"
+      },
+      "items": [
+        "rusty_sword"
+      ],
+      "theme": "stairs"
+    },
+    {
+      "id": "store",
+      "name": "Mossgate General Store",
+      "description": "Shelves of everything a hero might need and several things they won't. The shopkeeper watches you with the calm of a person who has seen adventurers come and go, mostly go.",
+      "exits": {
+        "e": "square"
+      },
+      "shop": {
+        "sells": [
+          "leather_cap",
+          "padded_jerkin",
+          "wooden_shield",
+          "iron_sword",
+          "oak_staff",
+          "healing_draught"
+        ]
+      },
+      "theme": "store"
+    },
+    {
+      "id": "hall",
+      "name": "Hall of Second Chances",
+      "description": "A hushed, candle-lit hall under the clocktower where the fallen wake with ringing ears and a headache. A sign reads: 'DEATH IS A SCHEDULING CONFLICT. YOUR BELONGINGS ARE WHERE YOU LEFT THEM.' Steps lead back down to the square.",
+      "exits": {
+        "d": "square"
+      },
+      "respawn": true,
+      "theme": "hall"
+    }
+  ]
+}

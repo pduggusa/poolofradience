@@ -1,0 +1,27 @@
+{
+  "id": "sunken_crypt",
+  "name": "The Sunken Crypt",
+  "levels": [
+    {
+      "id": "level_1",
+      "name": "Flooded Halls",
+      "grid": [
+        "##########",
+        "#S..#...T#",
+        "#.#.+.#.##",
+        "#.#.#.#..#",
+        "#r..#.##.#",
+        "####+#...#",
+        "#B.....#W#",
+        "##########"
+      ],
+      "legend": {
+        "S": { "type": "start", "facing": "e" },
+        "r": { "type": "encounter", "monsters": [{ "id": "crypt_rat", "count": "2d4" }] },
+        "B": { "type": "encounter", "monsters": [{ "id": "bone_walker", "count": "1d4" }] },
+        "W": { "type": "encounter", "monsters": [{ "id": "lantern_wraith", "count": 1 }] },
+        "T": { "type": "treasure", "gold": 50, "items": [] }
+      }
+    }
+  ]
+}

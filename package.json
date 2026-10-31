@@ -1,0 +1,23 @@
+{
+  "name": "poolofradience",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "tsx tools/validate.ts",
+    "typecheck": "tsc --noEmit",
+    "start": "tsx engine/server.ts",
+    "arch": "tsx tools/arch.ts",
+    "art:preview": "tsx tools/art-preview.ts",
+    "web": "tsx engine/web.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.7"
+  },
+  "dependencies": {
+    "ws": "^8.22.1"
+  }
+}

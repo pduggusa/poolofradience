@@ -1,0 +1,273 @@
+{
+  "items": [
+    {
+      "id": "wheel_of_cheese",
+      "name": "wheel of cheese",
+      "description": "A perfectly ordinary wheel of cheese. Somewhere, a goblin is keeping a tally of how many you've taken.",
+      "kind": "food",
+      "value": 2,
+      "respawns": true,
+      "heals": "1d4",
+      "nourishes": 20,
+      "weight": 3,
+      "minLevel": 1
+    },
+    {
+      "id": "polished_mug",
+      "name": "well-polished mug",
+      "description": "The barkeep has been polishing this for years. It is the cleanest object in the county, and he will notice it's gone.",
+      "kind": "misc",
+      "value": 3,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "rusty_sword",
+      "name": "rusty short sword",
+      "description": "More rust than sword. It was a good sword once, much like most of us were once good at things.",
+      "kind": "weapon",
+      "value": 8,
+      "damage": "1d6",
+      "weight": 4,
+      "minLevel": 1
+    },
+    {
+      "id": "cellar_key_ring",
+      "name": "ring of suspicious keys",
+      "description": "None of them fit anything. All of them are definitely important.",
+      "kind": "misc",
+      "value": 2,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "scroll_frost_lance",
+      "name": "scroll of Frost Lance",
+      "description": "A water-stained scroll. The ink is cold to the touch.",
+      "kind": "scroll",
+      "value": 40,
+      "teaches": "frost_lance",
+      "weight": 0,
+      "minLevel": 1
+    },
+    {
+      "id": "leather_cap",
+      "name": "leather cap",
+      "description": "Smells of the previous owner's worries.",
+      "kind": "armor",
+      "slot": "head",
+      "acBonus": 1,
+      "value": 15,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "padded_jerkin",
+      "name": "padded jerkin",
+      "description": "Quilted, lumpy, and surprisingly effective against rats.",
+      "kind": "armor",
+      "slot": "body",
+      "acBonus": 2,
+      "value": 35,
+      "weight": 5,
+      "minLevel": 1
+    },
+    {
+      "id": "wooden_shield",
+      "name": "wooden shield",
+      "description": "A round shield with a face painted on it. The face looks worried.",
+      "kind": "armor",
+      "slot": "shield",
+      "acBonus": 1,
+      "value": 20,
+      "weight": 4,
+      "minLevel": 1
+    },
+    {
+      "id": "iron_sword",
+      "name": "iron sword",
+      "description": "Honest iron. Slightly better than being punched.",
+      "kind": "weapon",
+      "damage": "1d8",
+      "value": 60,
+      "weight": 5,
+      "minLevel": 2
+    },
+    {
+      "id": "oak_staff",
+      "name": "oak staff",
+      "description": "A walking stick with ambitions.",
+      "kind": "weapon",
+      "damage": "1d6",
+      "value": 30,
+      "weight": 3,
+      "minLevel": 1
+    },
+    {
+      "id": "healing_draught",
+      "name": "healing draught",
+      "description": "A small bottle of something green. It tastes of mint and regret.",
+      "kind": "food",
+      "heals": "2d6+2",
+      "value": 25,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "travel_bread",
+      "name": "loaf of travel bread",
+      "description": "Dense, dry, and loyal. It will outlive you.",
+      "kind": "food",
+      "nourishes": 30,
+      "value": 4,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "dried_sausage",
+      "name": "dried sausage",
+      "description": "Nobody asks what's in it. Everybody asks for another.",
+      "kind": "food",
+      "nourishes": 25,
+      "heals": "1d4",
+      "value": 6,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "ale",
+      "name": "mug of ale",
+      "description": "Filling, in the way a handshake is filling.",
+      "kind": "food",
+      "nourishes": 10,
+      "value": 2,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "goblin_ledger",
+      "name": "loot goblin's ledger",
+      "description": "Eleven years of meticulous entries. Your name appears on every page, and not kindly.",
+      "kind": "misc",
+      "value": 30,
+      "weight": 2,
+      "minLevel": 1
+    },
+    {
+      "id": "bone_dagger",
+      "name": "bone-hilted dagger",
+      "description": "Light, balanced, and made from something you'd rather not identify.",
+      "kind": "weapon",
+      "damage": "1d6+1",
+      "value": 40,
+      "weight": 2,
+      "minLevel": 2
+    },
+    {
+      "id": "tattered_gloves",
+      "name": "tattered gloves",
+      "description": "Fingerless by accident.",
+      "kind": "armor",
+      "slot": "hands",
+      "acBonus": 1,
+      "value": 12,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "stave_club",
+      "name": "barrel-stave club",
+      "description": "A stave from a barrel that was 'allegedly' a barrel. It still seems a little smug.",
+      "kind": "weapon",
+      "damage": "1d8+1",
+      "value": 55,
+      "weight": 6,
+      "minLevel": 3
+    },
+    {
+      "id": "lantern_shard",
+      "name": "lantern shard",
+      "description": "A sliver of pale glass that gives off a cold, steady light. Worth a lot to the right collector.",
+      "kind": "misc",
+      "value": 90,
+      "weight": 1,
+      "minLevel": 1
+    },
+    {
+      "id": "wraith_boots",
+      "name": "wraith-silk boots",
+      "description": "They make no sound. Neither do you, now. You didn't ask for this.",
+      "kind": "armor",
+      "slot": "feet",
+      "acBonus": 2,
+      "value": 80,
+      "weight": 2,
+      "minLevel": 4
+    },
+    {
+      "id": "recruiter_pamphlet",
+      "name": "guild pamphlet",
+      "description": "'CASUAL-FRIENDLY, HARDCORE-PROGRESSION.' The paper is excellent for lighting fires.",
+      "kind": "misc",
+      "value": 1,
+      "weight": 0,
+      "minLevel": 1
+    },
+    {
+      "id": "chicken_feather",
+      "name": "dire chicken feather",
+      "description": "Surprisingly soft. Slightly accusing.",
+      "kind": "misc",
+      "value": 3,
+      "weight": 0,
+      "minLevel": 1
+    },
+    {
+      "id": "blade_of_authority",
+      "name": "Blade of Indisputable Authority",
+      "description": "It has never lost an argument. It does not argue; it simply concludes. Only the architects of this place can lift it.",
+      "kind": "weapon",
+      "damage": "1d4",
+      "weight": 2,
+      "value": 0,
+      "bound": true,
+      "archOnly": true,
+      "instantKill": true
+    },
+    {
+      "id": "shiny_pebble",
+      "name": "unusually shiny pebble",
+      "description": "It's just a pebble. A very well-polished pebble.",
+      "kind": "misc",
+      "value": 3,
+      "weight": 0,
+      "wild": 0.08
+    },
+    {
+      "id": "rabbit_foot",
+      "name": "lucky rabbit's foot",
+      "description": "Lucky for someone. Not the rabbit.",
+      "kind": "misc",
+      "value": 120,
+      "weight": 0,
+      "wild": 0.01
+    },
+    {
+      "id": "hiccuping_flask",
+      "name": "dented flask",
+      "description": "Something in it hums. Smells of ozone and bad decisions. Probably safe.",
+      "kind": "food",
+      "heals": "3d6",
+      "value": 20,
+      "weight": 1
+    },
+    {
+      "id": "magic_beans",
+      "name": "bag of ordinary beans",
+      "description": "They're beans. Ozzie says they're magic. Timbles says they're beans.",
+      "kind": "misc",
+      "value": 1,
+      "weight": 0
+    }
+  ]
+}

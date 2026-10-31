@@ -1,0 +1,292 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>POOLVX MUD</title>
+<style>
+  :root { --fg:#aaa; --bg:#000; --hi:#ff5; }
+  body.c64 { --fg:#a0a0ff; --bg:#4040e0; --hi:#fff; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:15px/1.3 "Courier New",monospace; }
+  body { display:flex; flex-direction:column; }
+  #top { display:flex; justify-content:center; gap:12px; padding:10px 10px 0; }
+  #center { display:flex; flex-direction:column; align-items:stretch; }
+  #side { width:236px; background:#111; border:4px solid #555; padding:6px 8px; font-size:13px; max-height:454px; overflow-y:auto; box-sizing:border-box; }
+  #who { color:var(--hi); font-weight:bold; margin-bottom:4px; }
+  .bar { position:relative; height:14px; background:#222; margin:2px 0; border:1px solid #555; }
+  .bar i { position:absolute; left:0; top:0; bottom:0; display:block; } .bar b { position:absolute; left:4px; top:-1px; font-size:11px; color:#fff; text-shadow:1px 1px #000; }
+  #hpbar { background:#a00; } #mpbar { background:#00a; } #xpbar { background:#a50; }
+  #stats2 { margin:4px 0 6px; color:#aaa; } h4 { margin:8px 0 3px; color:#5ff; font-size:12px; letter-spacing:1px; }
+  .item { padding:1px 4px; cursor:pointer; } .item:hover { background:#333; } .item.worn { color:#5f5; }
+  .acts { display:flex; gap:4px; flex-wrap:wrap; padding:2px 4px 4px; } .acts button { font:inherit; font-size:11px; }
+  #btns { display:flex; flex-wrap:wrap; gap:4px; padding:6px 0 0; justify-content:center; }
+  button { background:#333; color:#ddd; border:1px solid #777; padding:2px 8px; font:13px "Courier New",monospace; cursor:pointer; }
+  button:hover { background:#555; color:#fff; } button.warn { background:#600; border-color:#f55; color:#fff; }
+  a.l { color:#5ff; cursor:pointer; text-decoration:underline dotted; } a.l:hover { color:#fff; background:#044; }
+  .choice { cursor:pointer; } .choice:hover { background:#044; color:#fff; }
+  #frame { border:6px solid #555; background:#000; transition:border-color .3s; }
+  #frame.fight { border-color:#a00; }
+  #frame.danger { border-color:#f55; animation:blink .5s steps(2) infinite; }
+  @keyframes blink { 50% { border-color:#600; } }
+  canvas { width:640px; height:400px; image-rendering:pixelated; display:block; }
+  #caption { background:#00a; color:#fff; text-align:center; padding:2px 6px; font-weight:bold; }
+  #term { flex:1; overflow-y:auto; padding:8px 18px; white-space:pre-wrap; width:100%; max-width:1000px; margin:0 auto; box-sizing:border-box; }
+  .tip { color:#5f5; } .quest { color:#ff5; } .danger { color:#f55; font-weight:bold; } .room { color:var(--hi); font-weight:bold; }
+  .prompt { color:#5ff; } .echo { color:#fff; } .sys { color:#f5f; }
+  #bar { display:flex; max-width:1000px; width:100%; margin:0 auto; padding:6px 18px 14px; box-sizing:border-box; }
+  #bar span { color:#5ff; padding-right:8px; } #in { flex:1; background:transparent; border:0; outline:0; color:#fff; font:inherit; }
+</style>
+<div id="top">
+  <div id="center">
+    <div id="frame"><canvas id="scene" width="320" height="200"></canvas><div id="caption">POOLVX -- connecting...</div></div>
+    <div id="btns"></div>
+  </div>
+  <div id="side"><div id="who">Not logged in</div><div id="vitals"></div><h4>PACK</h4><div id="inv">(empty)</div></div>
+</div>
+<div id="term"></div>
+<div id="bar"><span>&gt;</span><input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus></div>
+<script type="module">
+const art = await (await fetch("/art.json")).json();
+const PAL = art.palette;
+const cv = document.getElementById("scene"), g = cv.getContext("2d");
+g.imageSmoothingEnabled = false;
+const W = 320, H = 200, BX0 = 88, BY0 = 50, BX1 = 232, BY1 = 134; // the back wall rectangle; everything converges here
+
+// ---------- clickable regions (rebuilt every frame; later entries sit on top) ----------
+let regions = [], baseCaption = "";
+const hot = (x, y, w, h, cmd, label) => regions.push({ x, y, w, h, cmd, label });
+const hit = (e) => { const b = cv.getBoundingClientRect(), x = ((e.clientX - b.left) * W) / b.width, y = ((e.clientY - b.top) * H) / b.height;
+  for (let i = regions.length - 1; i >= 0; i--) { const r = regions[i]; if (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h) return r; } };
+
+// ---------- tiny drawing kit ----------
+const patCache = {};
+function pat(a, b = a) { // 2x2 checker dither of two EGA colors: how the era faked a 17th, 18th, 19th color
+  const k = a + "," + b; if (patCache[k]) return patCache[k];
+  const c = document.createElement("canvas"); c.width = 2; c.height = 2; const x = c.getContext("2d");
+  x.fillStyle = PAL[a]; x.fillRect(0, 0, 2, 2); x.fillStyle = PAL[b]; x.fillRect(0, 0, 1, 1); x.fillRect(1, 1, 1, 1);
+  return (patCache[k] = g.createPattern(c, "repeat"));
+}
+const poly = (pts, fill) => { g.fillStyle = fill; g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fill(); };
+const rect = (x, y, w, h, fill) => { g.fillStyle = fill; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const line = (x1, y1, x2, y2, c) => { g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); g.moveTo(x1 + .5, y1 + .5); g.lineTo(x2 + .5, y2 + .5); g.stroke(); };
+const wallTop = (x) => (BY0 * x) / BX0, wallBot = (x) => H - ((H - BY1) * x) / BX0; // wall height at distance x from the edge
+
+function shell(t) { // the room box: ceiling, floor, two side walls, back wall
+  poly([[0, 0], [W, 0], [BX1, BY0], [BX0, BY0]], pat(...t.ceil));
+  poly([[0, H], [W, H], [BX1, BY1], [BX0, BY1]], pat(...t.floor));
+  poly([[0, 0], [BX0, BY0], [BX0, BY1], [0, H]], pat(...t.wall));
+  poly([[W, 0], [BX1, BY0], [BX1, BY1], [W, H]], pat(...(t.wall2 || t.wall)));
+  g.fillStyle = pat(...t.back); g.fillRect(BX0, BY0, BX1 - BX0, BY1 - BY0);
+}
+function seams(c, { walls = true, floor = true } = {}) { // perspective construction lines: bricks, tiles
+  const col = PAL[c];
+  if (walls) {
+    for (const t of [.17, .34, .5, .67, .84]) { line(0, t * H, BX0, BY0 + t * (BY1 - BY0), col); line(W, t * H, BX1, BY0 + t * (BY1 - BY0), col); }
+    for (const x of [28, 50, 66, 78]) { line(x, wallTop(x), x, wallBot(x), col); line(W - x, wallTop(x), W - x, wallBot(x), col); }
+  }
+  if (floor) {
+    for (const y of [140, 150, 164, 184]) { const f = (y - BY1) / (H - BY1); line(BX0 - BX0 * f, y, BX1 + (W - BX1) * f, y, col); }
+    for (const y of [40, 28, 14, 4]) { const f = (BY0 - y) / BY0; line(BX0 - BX0 * f, y, BX1 + (W - BX1) * f, y, col); }
+    for (let k = -3; k <= 3; k++) { line(160 + k * 20, BY1, 160 + k * 85, H, col); line(160 + k * 20, BY0, 160 + k * 85, 0, col); }
+  }
+}
+function sideDoor(side, frame = 6, inner = 0) { // a doorway in a side wall, foreshortened
+  const xa = 22, xb = 52, px = (x) => (side < 0 ? x : W - x), h = (x) => (wallBot(x) - wallTop(x)) * 0.62;
+  poly([[px(xa), wallBot(xa) - h(xa)], [px(xb), wallBot(xb) - h(xb)], [px(xb), wallBot(xb)], [px(xa), wallBot(xa)]], PAL[inner]);
+  g.strokeStyle = PAL[frame]; g.lineWidth = 2; g.beginPath();
+  g.moveTo(px(xa), wallBot(xa)); g.lineTo(px(xa), wallBot(xa) - h(xa)); g.lineTo(px(xb), wallBot(xb) - h(xb)); g.lineTo(px(xb), wallBot(xb)); g.stroke();
+}
+function backDoor(frame = 6, inner = 0) { // an arched doorway in the back wall
+  rect(146, 88, 28, 46, PAL[inner]); g.beginPath(); g.arc(160, 88, 14, Math.PI, 0); g.fillStyle = PAL[inner]; g.fill();
+  g.strokeStyle = PAL[frame]; g.lineWidth = 2; g.beginPath(); g.moveTo(146, 134); g.lineTo(146, 88); g.arc(160, 88, 14, Math.PI, 0); g.lineTo(174, 134); g.stroke();
+}
+const stairsUp = () => { for (let i = 0; i < 4; i++) rect(150 - i * 3, 4 + i * 5, 20 + i * 6, 3, PAL[i % 2 ? 7 : 15]); };
+const stairsDown = () => { poly([[130, 168], [190, 168], [200, 190], [120, 190]], PAL[0]); for (let i = 0; i < 4; i++) line(126 + i * 2, 172 + i * 4, 194 - i * 2, 172 + i * 4, PAL[8]); };
+function torch(x, y, s = 1) { rect(x, y, 2 * s, 7 * s, PAL[6]); rect(x - s, y - 4 * s, 4 * s, 4 * s, PAL[12]); rect(x, y - 3 * s, 2 * s, 3 * s, PAL[14]); }
+function candle(x, y, s = 1) { rect(x, y, 2 * s, 6 * s, PAL[15]); rect(x, y - 3 * s, 2 * s, 3 * s, PAL[14]); }
+const NAMES = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
+function registerExits(ex) { // big, forgiving hit areas: click a side wall to go that way
+  const lbl = (d) => "Go " + NAMES[d];
+  if (ex.includes("w")) hot(0, 0, BX0, H, "w", lbl("w"));
+  if (ex.includes("e")) hot(BX1, 0, W - BX1, H, "e", lbl("e"));
+  if (ex.includes("n")) hot(BX0, BY0, BX1 - BX0, BY1 - BY0, "n", lbl("n"));
+  if (ex.includes("u")) hot(100, 0, 120, BY0, "u", lbl("u"));
+  if (ex.includes("d")) hot(104, 156, 112, 44, "d", lbl("d"));
+  if (ex.includes("s")) { g.fillStyle = "#000"; g.fillRect(118, 187, 84, 13); g.fillStyle = PAL[14]; g.font = "bold 9px monospace"; g.textAlign = "center"; g.fillText("\u25BC BACK (S)", 160, 197); hot(110, 186, 100, 14, "s", lbl("s")); }
+}
+function exits(ex, doorFrame, inner) { // facing north: n ahead, e right, w left; u/d are stairs; s is behind you
+  if (ex.includes("w")) sideDoor(-1, doorFrame, inner);
+  if (ex.includes("e")) sideDoor(1, doorFrame, inner);
+  if (ex.includes("n")) backDoor(doorFrame, inner);
+  if (ex.includes("u")) stairsUp();
+  if (ex.includes("d")) stairsDown();
+}
+
+// ---------- backdrops, one per theme ----------
+const THEMES = {
+  crypt(s) {
+    shell({ ceil: [0, 8], floor: [0, 8], wall: [8, 0], back: [8, 0] }); seams(7);
+    poly([[0, H], [W, H], [W - 30, 160], [30, 160]], pat(1, 0)); for (const y of [168, 176, 186]) line(20, y, W - 20, y, PAL[9]); // flooded floor
+    torch(30, 96, 1); torch(W - 32, 96, 1); exits(s.exits, 7, 0);
+  },
+  stairs(s) {
+    shell({ ceil: [0, 8], floor: [8, 7], wall: [8, 0], back: [0, 8] }); seams(7);
+    for (let i = 0; i < 6; i++) { const y = BY1 + i * 12; rect(BX0 - i * 10, y, BX1 - BX0 + i * 20, 5, PAL[i % 2 ? 8 : 7]); }
+    torch(36, 90); torch(W - 38, 90); exits(s.exits.filter((e) => e !== "u" && e !== "d"), 7, 0);
+  },
+  cellar(s) {
+    shell({ ceil: [0, 6], floor: [6, 0], wall: [6, 0], back: [6, 0] }); seams(0);
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { const x = BX0 + 6 + c * 22, y = BY0 + 4 + r * 26; g.fillStyle = PAL[6]; g.beginPath(); g.ellipse(x + 9, y + 11, 9, 11, 0, 0, 7); g.fill(); rect(x, y + 5, 18, 2, PAL[8]); rect(x, y + 15, 18, 2, PAL[8]); }
+    torch(22, 100, 1); torch(W - 24, 100, 1); exits(s.exits, 14, 0);
+  },
+  tavern(s) {
+    shell({ ceil: [6, 0], floor: [6, 0], wall: [6, 4], back: [6, 4] }); seams(0);
+    rect(120, 76, 80, 58, PAL[8]); rect(130, 90, 60, 44, PAL[0]); rect(142, 106, 36, 28, PAL[4]); rect(148, 112, 24, 22, PAL[12]); rect(154, 118, 12, 16, PAL[14]);
+    for (const x of [0, 100, 200, 300]) line(x, 0, x < 160 ? x + 40 : x - 40, 50, PAL[0]); // ceiling beams
+    rect(40, 104, 22, 4, PAL[14]); rect(46, 108, 4, 22, PAL[6]); rect(W - 62, 104, 22, 4, PAL[14]); rect(W - 56, 108, 4, 22, PAL[6]);
+    exits(s.exits, 14, 0);
+  },
+  store(s) {
+    shell({ ceil: [6, 0], floor: [6, 7], wall: [6, 0], back: [6, 0] }); seams(0);
+    for (const y of [70, 92, 114]) { rect(BX0 + 4, y + 12, 136, 3, PAL[7]); for (let k = 0; k < 7; k++) rect(BX0 + 8 + k * 19, y, 10, 12, PAL[[4, 9, 14, 10, 13, 12, 11][(k + y) % 7]]); }
+    exits(s.exits, 14, 0);
+  },
+  hall(s) {
+    shell({ ceil: [1, 0], floor: [15, 8], wall: [5, 1], back: [5, 1] }); seams(13);
+    for (const [x, y, k] of [[30, 120, 1.4], [W - 34, 120, 1.4], [70, 104, 1], [W - 72, 104, 1]]) candle(x, y, k);
+    rect(150, 70, 20, 4, PAL[14]); exits(s.exits, 14, 1);
+  },
+  village(s) { // outdoors: sky, rooftops and a fountain
+    rect(0, 0, W, 40, PAL[9]); poly([[0, 40], [W, 40], [W, 62], [0, 62]], pat(9, 11)); rect(0, 62, W, 38, PAL[11]);
+    poly([[0, 20], [BX0 - 10, 62], [BX0 - 10, 112], [0, 150]], PAL[6]); poly([[W, 20], [BX1 + 10, 62], [BX1 + 10, 112], [W, 150]], PAL[6]);
+    poly([[0, 8], [BX0 - 10, 56], [BX0 - 10, 64], [0, 24]], PAL[4]); poly([[W, 8], [BX1 + 10, 56], [BX1 + 10, 64], [W, 24]], PAL[4]);
+    for (const [x, y] of [[22, 72], [48, 84]]) { rect(x, y, 10, 12, PAL[14]); rect(W - x - 10, y, 10, 12, PAL[14]); }
+    rect(BX0 - 10, 92, BX1 - BX0 + 20, 42, PAL[8]); for (let k = 0; k < 5; k++) { const x = BX0 + k * 30; poly([[x, 92], [x + 14, 76], [x + 28, 92]], PAL[k % 2 ? 4 : 12]); rect(x + 8, 108, 10, 12, PAL[14]); }
+    poly([[0, H], [W, H], [BX1 + 20, 134], [BX0 - 20, 134]], pat(8, 7)); seams(8, { walls: false });
+    g.fillStyle = PAL[7]; g.beginPath(); g.ellipse(160, 150, 30, 8, 0, 0, 7); g.fill(); g.fillStyle = PAL[9]; g.beginPath(); g.ellipse(160, 149, 24, 5, 0, 0, 7); g.fill(); rect(158, 128, 4, 20, PAL[7]); rect(156, 126, 8, 3, PAL[11]);
+    exits(s.exits.filter((e) => e === "u" || e === "d"), 7, 0);
+  },
+  road(s) { // outdoors: pines and a dirt road to the vanishing point
+    rect(0, 0, W, 50, PAL[9]); poly([[0, 50], [W, 50], [W, 80], [0, 80]], pat(9, 11)); rect(0, 80, W, 30, PAL[11]);
+    rect(0, 92, W, 108, PAL[2]); poly([[0, 92], [W, 92], [W, 130], [0, 130]], pat(2, 10));
+    poly([[0, H], [W, H], [172, 92], [148, 92]], pat(6, 14)); line(148, 92, 0, H, PAL[6]); line(172, 92, W, H, PAL[6]);
+    for (const [x, y, k] of [[26, 150, 2.4], [70, 118, 1.6], [W - 30, 152, 2.4], [W - 76, 118, 1.6], [110, 104, 1], [W - 112, 104, 1]]) {
+      rect(x - k, y, 2 * k, 14 * k, PAL[6]); for (let i = 0; i < 4; i++) poly([[x - (4 - i) * 5 * k / 2, y - i * 9 * k + 6 * k], [x + (4 - i) * 5 * k / 2, y - i * 9 * k + 6 * k], [x, y - i * 9 * k - 8 * k]], PAL[i % 2 ? 2 : 10]); }
+    exits(s.exits.filter((e) => e === "u" || e === "d"), 7, 0);
+  },
+};
+
+// ---------- sprites ----------
+const spriteCache = {};
+function sprite(id) {
+  if (spriteCache[id]) return spriteCache[id];
+  const rows = art.sprites[id]; if (!rows) return null;
+  const c = document.createElement("canvas"); c.width = rows[0].length; c.height = rows.length; const x = c.getContext("2d");
+  rows.forEach((r, y) => [...r].forEach((ch, xx) => { if (ch !== ".") { x.fillStyle = PAL[parseInt(ch, 16)]; x.fillRect(xx, y, 1, 1); } }));
+  return (spriteCache[id] = c);
+}
+function blit(spr, cx, bottom, scale) { // nearest-neighbour scale: bigger = closer
+  const w = spr.width * scale, h = spr.height * scale;
+  g.fillStyle = pat(0, 8); g.beginPath(); g.ellipse(cx, bottom - 2, w * 0.4, 5, 0, 0, 7); g.fill(); // dithered contact shadow
+  g.drawImage(spr, Math.round(cx - w / 2), Math.round(bottom - h), w, h);
+  return { x: Math.round(cx - w / 2), y: Math.round(bottom - h), w, h };
+}
+function actors(s) {
+  const n = s.mobs.length, scale = n <= 1 ? 6 : n === 2 ? 5 : 4;
+  s.mobs.forEach((m, i) => {
+    const spr = sprite(m.sprite || m.id); if (!spr) return;
+    const cx = 160 + (i - (n - 1) / 2) * (n > 1 ? 90 : 0);
+    if (m.n > 1) blit(spr, cx + 34, 142, Math.max(2, scale - 2)); // the rest of the pack, further back
+    if (m.n > 2) blit(spr, cx - 34, 142, Math.max(2, scale - 2));
+    const b = blit(spr, cx, 156, scale); hot(b.x, b.y, b.w, b.h, `attack ${m.id}`, `Attack ${m.name}${m.n > 1 ? " (x" + m.n + ")" : ""}`);
+  });
+  s.npcs.forEach((p, i) => { const spr = sprite(p.sprite); if (spr) { const b = blit(spr, 50 + i * 100, H - 2, 5); hot(b.x, b.y, b.w, b.h, `talk ${p.id}`, `Talk to ${p.name}`); } }); // people stand in the foreground
+  if (s.corpse) hot(126, 164, 68, 30, "loot", s.corpse === "corpse" ? "Loot the corpse" : "Loot the pile");
+  if (s.items) hot(200, 176, 64, 24, "get all", "Pick up everything on the floor");
+  if (s.corpse) { g.fillStyle = PAL[6]; g.beginPath(); g.ellipse(160, 182, 28, 7, 0, 0, 7); g.fill(); rect(144, 174, 14, 3, PAL[15]); rect(166, 177, 3, 3, PAL[15]); rect(152, 180, 10, 2, PAL[7]); if (s.corpse === "corpse") rect(158, 168, 4, 4, PAL[15]); }
+  for (let i = 0; i < Math.min(s.items, 4); i++) { const x = 210 + i * 14, y = 186; rect(x, y, 3, 3, PAL[14]); rect(x + 1, y - 1, 1, 5, PAL[15]); rect(x - 1, y + 1, 5, 1, PAL[15]); } // glints: loot on the floor
+}
+
+function drawScene(s) {
+  regions = [];
+  (THEMES[s.theme] || THEMES.village)(s);
+  registerExits(s.exits);
+  actors(s);
+  renderMe(s.me);
+  if (s.hp < 35) for (const [x, y, w, h] of [[0, 0, W, 6], [0, H - 6, W, 6], [0, 0, 6, H], [W - 6, 0, 6, H]]) { g.globalAlpha = 0.45; rect(x, y, w, h, PAL[4]); g.globalAlpha = 1; }
+  const fr = document.getElementById("frame"); fr.className = s.hp < 35 && s.fight ? "danger" : s.fight ? "fight" : "";
+  baseCaption = `${s.name.toUpperCase()}   [${s.exits.join(" ")}]`; document.getElementById("caption").textContent = baseCaption;
+  document.getElementById("flee")?.classList.toggle("warn", !!s.fight);
+}
+
+// ---------- side panel: vitals + clickable pack ----------
+let openItem = null;
+function renderMe(me) {
+  if (!me) return;
+  document.getElementById("who").textContent = `${me.wiz ? "\u2605 " : ""}${me.name} -- L${me.level} ${me.race} ${me.cls}`.trim();
+  const bar = (id, label, v, max) => `<div class="bar"><i id="${id}" style="width:${Math.min(100, (v / Math.max(1, max)) * 100)}%"></i><b>${label} ${v}/${max}</b></div>`;
+  document.getElementById("vitals").innerHTML = bar("hpbar", "HP", me.hp, me.hpMax) + bar("mpbar", "MP", me.mp, me.mpMax) + bar("xpbar", "XP", me.xp, me.xpNext) +
+    `<div id="stats2">Food: ${me.food}<br>Gold: ${me.gold}<br>Load: ${me.weight}/${me.cap}</div>`;
+  const inv = document.getElementById("inv"); inv.textContent = "";
+  if (!me.inv.length) inv.textContent = "(empty)";
+  me.inv.forEach((it, idx) => {
+    const key = it.id + ":" + idx, row = document.createElement("div");
+    row.className = "item" + (it.worn ? " worn" : ""); row.textContent = it.name + (it.worn ? (it.kind === "weapon" ? " (wielded)" : " (worn)") : "");
+    row.onclick = () => { openItem = openItem === key ? null : key; renderMe(me); };
+    inv.appendChild(row);
+    if (openItem === key) {
+      const acts = document.createElement("div"); acts.className = "acts";
+      const verbs = [];
+      if (it.kind === "weapon") verbs.push(it.worn ? "remove" : "wield"); else if (it.kind === "armor") verbs.push(it.worn ? "remove" : "wear");
+      else if (it.kind === "food") verbs.push("use"); else if (it.kind === "scroll") verbs.push("learn");
+      verbs.push("examine", "drop");
+      verbs.forEach((v) => { const b = document.createElement("button"); b.textContent = v; b.onclick = (e) => { e.stopPropagation(); send(`${v} ${it.id}`); openItem = null; }; acts.appendChild(b); });
+      inv.appendChild(acts);
+    }
+  });
+}
+const BTNS = [["Look", "look"], ["Pack", "i"], ["Score", "score"], ["Quests", "quests"], ["Spells", "spells"], ["Loot", "loot"], ["Corpse", "corpse"], ["Flee", "flee", "flee"], ["Who", "who"], ["Help", "help"]];
+for (const [label, cmd, id] of BTNS) { const b = document.createElement("button"); b.textContent = label; if (id) b.id = id; b.onclick = () => send(cmd); document.getElementById("btns").appendChild(b); }
+cv.addEventListener("mousemove", (e) => { const r = hit(e); cv.style.cursor = r ? "pointer" : "default"; document.getElementById("caption").textContent = r ? "\u25B6 " + r.label : baseCaption; });
+cv.addEventListener("mouseleave", () => { document.getElementById("caption").textContent = baseCaption; });
+cv.addEventListener("click", (e) => { const r = hit(e); if (r) send(r.cmd); });
+
+// ---------- terminal ----------
+const term = document.getElementById("term"), input = document.getElementById("in");
+const lines = []; let partial = "", partialEl = document.createElement("div"); term.appendChild(partialEl);
+function cls(t) { return t.startsWith("[tip]") ? "tip" : t.startsWith("[quest]") || t.startsWith("***") ? "quest" : t.startsWith("[DANGER]") || t.includes("DEATH'S DOOR") || t.includes("You have died") ? "danger" : t.startsWith("==") ? "room" : t.startsWith("<HP") ? "prompt" : t.startsWith("[system]") ? "sys" : ""; }
+const link = (text, cmd) => { const a = document.createElement("a"); a.className = "l"; a.textContent = text; a.onclick = () => send(cmd); return a; };
+function linkify(d, t) { // make exits, numbered choices, (talk x), (read) and floor items clickable
+  let m;
+  if ((m = t.match(/^\s*(\d+)\)\s/))) { d.textContent = t; d.classList.add("choice"); d.onclick = () => send(m[1]); return; }
+  if ((m = t.match(/^(Exits: )(.*)$/)) && m[2] !== "none") { d.append(m[1]); m[2].split(", ").forEach((w, i) => { if (i) d.append(", "); d.append(link(w, w)); }); return; }
+  if ((m = t.match(/^(On the ground: )(.*)\.$/))) { d.append(m[1]); m[2].split(", ").forEach((w, i) => { if (i) d.append(", "); d.append(link(w, "get " + w)); }); d.append("."); return; }
+  const re = /\((talk \w+|read)\)|\('(loot)'\)/g; let last = 0;
+  if (re.test(t)) { re.lastIndex = 0; let x; while ((x = re.exec(t))) { d.append(t.slice(last, x.index)); d.append(link(x[0], x[1] || x[2])); last = x.index + x[0].length; } d.append(t.slice(last)); return; }
+  d.textContent = t || " ";
+}
+function addLine(t, c = cls(t)) { const d = document.createElement("div"); linkify(d, t); if (c) d.className = (d.className + " " + c).trim(); term.insertBefore(d, partialEl); lines.push(d); if (lines.length > 600) lines.shift().remove(); }
+function out(s) {
+  if (/COMMODORE 64 BASIC/.test(s)) document.body.classList.add("c64"); if (/Modern mode:/.test(s)) document.body.classList.remove("c64");
+  const parts = (partial + s.replace(/\r/g, "")).split("\n"); partial = parts.pop();
+  parts.forEach((t) => addLine(t)); partialEl.textContent = partial; term.scrollTop = term.scrollHeight;
+}
+
+// ---------- connection ----------
+const ws = new WebSocket(`ws://${location.host}/ws`);
+ws.onmessage = (e) => {
+  const m = JSON.parse(e.data);
+  if (m.t === "out") out(m.s);
+  else if (m.t === "echo") input.type = m.on ? "text" : "password";
+  else if (m.t === "scene") drawScene(m.d);
+};
+ws.onclose = () => { addLine("[connection closed -- reload the page to log in again]", "sys"); document.getElementById("caption").textContent = "POOLVX -- disconnected"; };
+const hist = []; let hi = 0;
+function send(cmd) { if (input.type === "password" || ws.readyState !== 1) return; addLine("> " + cmd, "echo"); ws.send(JSON.stringify({ t: "in", s: cmd })); }
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const v = input.value; if (input.type !== "password") { addLine("> " + v, "echo"); if (v.trim()) { hist.push(v); hi = hist.length; } } else addLine("> ********", "echo");
+    ws.send(JSON.stringify({ t: "in", s: v })); input.value = "";
+  } else if (e.key === "ArrowUp" && hi > 0) { input.value = hist[--hi]; e.preventDefault(); }
+  else if (e.key === "ArrowDown") { input.value = hi < hist.length - 1 ? hist[++hi] : ((hi = hist.length), ""); e.preventDefault(); }
+});
+document.body.addEventListener("click", () => input.focus());
+THEMES.village({ exits: ["n"], mobs: [], npcs: [], items: 0, hp: 100 }); // something pretty before you log in
+</script>

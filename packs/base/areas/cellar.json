@@ -1,0 +1,62 @@
+{
+  "id": "cellar",
+  "name": "The Unreasonably Large Cellar",
+  "start": "stairs",
+  "rooms": [
+    {
+      "id": "stairs",
+      "name": "Cellar Stairs",
+      "description": "The stairs down from the tavern go on far longer than the building is tall. A hand-painted sign reads: 'DUNGEON (NOT A DUNGEON, JUST A VERY SERIOUS CELLAR)'.",
+      "exits": {
+        "u": "mossgate/tavern",
+        "s": "kegs"
+      },
+      "spawns": [
+        {
+          "monster": "guild_recruiter",
+          "count": 1
+        }
+      ],
+      "theme": "stairs"
+    },
+    {
+      "id": "kegs",
+      "name": "The Kegs",
+      "description": "Hundreds of barrels, stacked to a ceiling that is somehow a hundred feet up. One of them is clearly watching you. A faded notice says: 'FARMING THIS AREA IS AGAINST THE RULES. - MGMT'.",
+      "exits": {
+        "n": "stairs",
+        "e": "pantry"
+      },
+      "spawns": [
+        {
+          "monster": "mimic_barrel",
+          "count": 1
+        },
+        {
+          "monster": "dire_chicken",
+          "count": 1
+        }
+      ],
+      "theme": "cellar"
+    },
+    {
+      "id": "pantry",
+      "name": "The Pantry of Respawning Cheese",
+      "description": "A single wheel of cheese sits on a shelf. You take it. Another wheel appears. You take that one too. This has clearly been going on a while. A goblin sits in the corner, keeping score.",
+      "exits": {
+        "w": "kegs"
+      },
+      "spawns": [
+        {
+          "monster": "loot_goblin",
+          "count": 2
+        }
+      ],
+      "items": [
+        "wheel_of_cheese"
+      ],
+      "book": "door_below_cheese",
+      "theme": "cellar"
+    }
+  ]
+}

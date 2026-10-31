@@ -1,0 +1,82 @@
+{
+  "quests": [
+    {
+      "id": "rat_problem",
+      "name": "The Barkeep's Rat Problem",
+      "description": "The barkeep swears the rats on the Old Road are getting bigger. Two should settle it.",
+      "completion": "The barkeep nods slowly. 'Bigger than I remembered. Thank you.' He resumes polishing.",
+      "offeredIn": "mossgate/tavern",
+      "objectives": [
+        {
+          "type": "kill",
+          "monster": "crypt_rat",
+          "count": 2
+        }
+      ],
+      "reward": {
+        "xp": 60,
+        "items": [],
+        "gold": 15
+      }
+    },
+    {
+      "id": "cheese_audit",
+      "name": "Cheese Audit",
+      "description": "The Guild Recruiter needs one (1) wheel of cheese from the pantry to 'complete a vital onboarding funnel'. Bring it to him.",
+      "completion": "He accepts the cheese, weeps briefly, and hands you a 'Welcome Packet' that is just a ring of keys.",
+      "offeredIn": "cellar/stairs",
+      "objectives": [
+        {
+          "type": "fetch",
+          "item": "wheel_of_cheese",
+          "count": 1
+        }
+      ],
+      "reward": {
+        "xp": 40,
+        "items": [
+          "cellar_key_ring"
+        ],
+        "gold": 10
+      }
+    },
+    {
+      "id": "touch_grass",
+      "name": "Touch Grass",
+      "description": "You have been underground a concerning length of time. Go to the Old Road and stand in the sun.",
+      "completion": "The recruiter looks relieved on your behalf. Then he offers you a guild invite.",
+      "offeredIn": "cellar/stairs",
+      "objectives": [
+        {
+          "type": "visit",
+          "room": "mossgate/road"
+        }
+      ],
+      "reward": {
+        "xp": 30,
+        "items": [],
+        "gold": 5
+      }
+    },
+    {
+      "id": "who_lit_the_lantern",
+      "name": "Who Lit the Lantern?",
+      "description": "Something has been lighting lanterns down in the Sunken Crypt. Find it. Make it stop.",
+      "completion": "The light goes out. Somewhere far away, a very small bell rings.",
+      "minLevel": 2,
+      "offeredIn": "mossgate/square",
+      "objectives": [
+        {
+          "type": "kill",
+          "monster": "lantern_wraith",
+          "count": 1
+        }
+      ],
+      "reward": {
+        "xp": 250,
+        "items": [],
+        "gold": 100
+      }
+    }
+  ]
+}

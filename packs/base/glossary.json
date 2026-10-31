@@ -1,0 +1,84 @@
+{
+  "terms": {
+    "ac": {
+      "title": "Armor Class (AC)",
+      "text": "How hard something is to hit. Lower is better: AC 10 is unarmored, AC 0 is nearly untouchable. This is the old tabletop convention."
+    },
+    "hd": {
+      "title": "Hit Dice (HD)",
+      "text": "A rough measure of toughness. Each hit die adds about 4-5 hit points, and tougher monsters are worth more experience."
+    },
+    "xp": {
+      "title": "Experience (XP)",
+      "text": "Points earned by defeating monsters. Enough XP raises your level."
+    },
+    "morale": {
+      "title": "Morale",
+      "text": "How willing a monster is to keep fighting. Low-morale creatures flee when hurt; undead never do."
+    },
+    "undead": {
+      "title": "Undead",
+      "text": "Creatures animated after death. They don't flee, don't sleep, and are often vulnerable to holy magic."
+    },
+    "shout": {
+      "title": "Shout",
+      "text": "Heard by everyone in the same area, like a village bell. Use 'gossip' to reach every area."
+    },
+    "gossip": {
+      "title": "Gossip",
+      "text": "A global chat channel that reaches every player in every area."
+    },
+    "mode": {
+      "title": "Modes",
+      "text": "'mode commodore' gives the bare 40-column experience with no hints. 'mode modern' turns tips and stats back on."
+    },
+    "mana": {
+      "title": "Mana (MP)",
+      "text": "The energy spells cost. It grows with your level and recovers slowly while you rest."
+    },
+    "spell": {
+      "title": "Spells",
+      "text": "Learn them from trainers ('learn') or by reading scrolls ('learn <scroll>'), then 'cast <spell> [target]'. Higher-level spells need a higher level to learn."
+    },
+    "class": {
+      "title": "Class",
+      "text": "Your calling decides your HP and mana growth, how fast you improve at hitting, and which spells you can learn. Warriors hit best, mages cast most, clerics sit in between."
+    },
+    "gold": {
+      "title": "Gold (gp)",
+      "text": "Money. Monsters and quests pay it; shops sell gear for it and buy your loot at half price."
+    },
+    "food": {
+      "title": "Food and hunger",
+      "text": "Your food meter drains over time (dwarves faster, elves slower). Hungry slows healing; Starving stops it; Famished hurts you. 'eat' bread, sausage, cheese or ale from the tavern."
+    },
+    "race": {
+      "title": "Race",
+      "text": "Your race adjusts HP, mana, hunger and how fast you learn. Dwarves are tough but hungry; elves are magical and frugal; humans learn faster."
+    },
+    "corpse": {
+      "title": "Death and corpses",
+      "text": "When you die you wake in the Hall of Second Chances. Everything you carried (except soulbound items) and your gold stay in a corpse where you fell. Only you can loot it for an hour; then it rots into a pile anyone can take. Type 'corpse' to see where yours is."
+    },
+    "loot": {
+      "title": "Loot",
+      "text": "Monsters drop items on the floor, reserved for whoever fought them for 30 seconds. Use 'loot' or 'get all'. Uncollected drops crumble after 5 minutes. Weight limits what you can carry."
+    },
+    "weight": {
+      "title": "Weight",
+      "text": "Everything weighs something. Your capacity is 30 + 5 per level, plus or minus your race (dwarves carry more). 'i' shows your load."
+    },
+    "deathsdoor": {
+      "title": "Death's Door",
+      "text": "The first blow that would kill you in a fight leaves you at 1 HP instead. You then have one chance to 'flee' (90% to escape) or heal. A second lethal blow kills you: you wake in the Hall of Second Chances, and your belongings stay with your corpse."
+    },
+    "wimpy": {
+      "title": "Wimpy",
+      "text": "'wimpy 30' makes you flee automatically when your HP falls to 30% or less. Fleeing can fail, so don't lean on it."
+    },
+    "talk": {
+      "title": "Talking",
+      "text": "'talk <name>' starts a conversation with someone in the room. Pick numbered replies; 'leave' ends it. Some conversations pay out once, like a free ale for good manners."
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "spells": [
+    {
+      "id": "spark",
+      "name": "Spark",
+      "description": "A crackling bolt. Reliable, small, and rude.",
+      "minLevel": 1,
+      "mana": 2,
+      "taughtIn": "mossgate/square",
+      "effect": {
+        "type": "damage",
+        "dice": "1d6+1"
+      },
+      "classes": [
+        "mage"
+      ]
+    },
+    {
+      "id": "mend",
+      "name": "Mend",
+      "description": "Knits small wounds. Tastes of mint.",
+      "minLevel": 1,
+      "mana": 3,
+      "taughtIn": "mossgate/square",
+      "effect": {
+        "type": "heal",
+        "dice": "2d6"
+      },
+      "classes": [
+        "cleric"
+      ]
+    },
+    {
+      "id": "summon_cheese",
+      "name": "Summon Cheese",
+      "description": "Conjures a wheel of cheese. The Guild Recruiter will not ask where it came from.",
+      "minLevel": 2,
+      "mana": 2,
+      "taughtIn": "cellar/stairs",
+      "effect": {
+        "type": "conjure",
+        "item": "wheel_of_cheese",
+        "count": 1
+      },
+      "classes": [
+        "mage",
+        "cleric"
+      ]
+    },
+    {
+      "id": "frost_lance",
+      "name": "Frost Lance",
+      "description": "A spear of ice that arrives before it is thrown.",
+      "minLevel": 3,
+      "mana": 6,
+      "effect": {
+        "type": "damage",
+        "dice": "3d6"
+      },
+      "classes": [
+        "mage"
+      ]
+    },
+    {
+      "id": "smite",
+      "name": "Smite",
+      "description": "A flash of righteous annoyance.",
+      "minLevel": 1,
+      "mana": 3,
+      "taughtIn": "mossgate/square",
+      "classes": [
+        "cleric"
+      ],
+      "effect": {
+        "type": "damage",
+        "dice": "1d8"
+      }
+    },
+    {
+      "id": "power_strike",
+      "name": "Power Strike",
+      "description": "Put your whole back into it.",
+      "minLevel": 1,
+      "mana": 2,
+      "taughtIn": "mossgate/tavern",
+      "classes": [
+        "warrior"
+      ],
+      "effect": {
+        "type": "damage",
+        "dice": "2d6"
+      }
+    },
+    {
+      "id": "second_wind",
+      "name": "Second Wind",
+      "description": "Catch your breath, mostly.",
+      "minLevel": 1,
+      "mana": 2,
+      "taughtIn": "mossgate/tavern",
+      "classes": [
+        "warrior"
+      ],
+      "effect": {
+        "type": "heal",
+        "dice": "2d4"
+      }
+    }
+  ]
+}
