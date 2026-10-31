@@ -29,8 +29,11 @@ const http = createServer((req, res) => {
 
 const wss = new WebSocketServer({ server: http, path: "/ws", maxPayload: 4096 });
 wss.on("connection", (ws, req) => {
+  ws.on("error", () => ws.terminate()); // a malformed frame must never become an uncaught exception
   const origin = req.headers.origin;
-  if (origin && new URL(origin).host !== req.headers.host) return void ws.close(1008, "bad origin"); // same-origin only
+  let sameOrigin = true; // requests with no Origin (non-browser clients) are allowed; browsers always send one
+  if (origin !== undefined) { try { sameOrigin = !!req.headers.host && new URL(origin).host === req.headers.host; } catch { sameOrigin = false; } }
+  if (!sameOrigin) return void ws.close(1008, "bad origin"); // same-origin only
   const sock = connect(MUD_PORT, "127.0.0.1");
   const dec = new StringDecoder("utf8");
   let acc = "";

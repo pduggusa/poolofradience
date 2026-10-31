@@ -1,6 +1,8 @@
 # Pool of Radience
 
-A love letter to the games that made me a computer person: an LPMud-style text world with Gold Box-style pixel art, built so that anyone can extend it.
+A whimsical simulator and love letter to the games that made me a computer person: an LPMud-style text world with Gold Box-style pixel art, built so that anyone can extend it. It is also a demonstration of what you can build with an AI pair (this repo was written with Claude Code), start to finish, in one long and very silly conversation.
+
+> **It is a simulation.** The VAX login is a prop. There are no real accounts: please use a made-up e-mail address and password.
 
 - **A real multiplayer MUD** over telnet, with accounts that persist: race and class, hit points, mana, a hunger meter, spells, quests, shops, armor, weight, loot, and corpses that rot into piles after an hour.
 - **A browser client** with faux-3D scenes drawn the way the old games did it: one-point perspective, dithered 16-color EGA palette, scaled sprites. Everything is clickable.
@@ -18,9 +20,9 @@ npm run web        # MUD + browser client -> http://127.0.0.1:8080
 npm start          # nc localhost 4000
 ```
 
-Log in with any e-mail-shaped username (the first login creates the account). Only a hash of the address is stored; the display name is masked.
+Log in with any made-up, e-mail-shaped username (the first login creates the account). Only a hash of the address is stored; the display name is masked.
 
-To make yourself an arch wizard (instant-kill blade, can approve other wizards):
+To make yourself an arch wizard (instant-kill blade, can approve other wizards), first log in once and create your character, then:
 
 ```sh
 npm run arch -- you@school.edu
@@ -40,7 +42,7 @@ See [`CLAUDE.md`](CLAUDE.md) for the architecture, the rules the design depends 
 
 ## Status
 
-A working prototype. No scripting for wizards yet, no in-browser sprite editor yet, no automated test suite. The browser client is localhost-only with no TLS or login of its own; do not expose it to the internet as-is.
+A working prototype. No scripting for wizards yet, no in-browser sprite editor yet, no automated test suite. It is a toy: the browser client is localhost-only, and there is no e-mail verification or TLS because the logins are fake on purpose. Do not put anything real in them.
 
 ## Legal
 

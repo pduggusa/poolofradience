@@ -221,9 +221,11 @@ let openItem = null;
 function renderMe(me) {
   if (!me) return;
   document.getElementById("who").textContent = `${me.wiz ? "\u2605 " : ""}${me.name} -- L${me.level} ${me.race} ${me.cls}`.trim();
-  const bar = (id, label, v, max) => `<div class="bar"><i id="${id}" style="width:${Math.min(100, (v / Math.max(1, max)) * 100)}%"></i><b>${label} ${v}/${max}</b></div>`;
-  document.getElementById("vitals").innerHTML = bar("hpbar", "HP", me.hp, me.hpMax) + bar("mpbar", "MP", me.mp, me.mpMax) + bar("xpbar", "XP", me.xp, me.xpNext) +
-    `<div id="stats2">Food: ${me.food}<br>Gold: ${me.gold}<br>Load: ${me.weight}/${me.cap}</div>`;
+  const v = document.getElementById("vitals"); v.textContent = ""; // built with DOM nodes + textContent only: nothing from the server is ever parsed as HTML
+  const num = (x) => (Number.isFinite(+x) ? +x : 0);
+  const bar = (id, label, val, max) => { const d = document.createElement("div"); d.className = "bar"; const i = document.createElement("i"); i.id = id; i.style.width = Math.max(0, Math.min(100, (num(val) / Math.max(1, num(max))) * 100)) + "%"; const b = document.createElement("b"); b.textContent = `${label} ${num(val)}/${num(max)}`; d.append(i, b); v.appendChild(d); };
+  bar("hpbar", "HP", me.hp, me.hpMax); bar("mpbar", "MP", me.mp, me.mpMax); bar("xpbar", "XP", me.xp, me.xpNext);
+  const st = document.createElement("div"); st.id = "stats2"; st.textContent = `Food: ${String(me.food)}\nGold: ${num(me.gold)}\nLoad: ${num(me.weight)}/${num(me.cap)}`; st.style.whiteSpace = "pre"; v.appendChild(st);
   const inv = document.getElementById("inv"); inv.textContent = "";
   if (!me.inv.length) inv.textContent = "(empty)";
   me.inv.forEach((it, idx) => {

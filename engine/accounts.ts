@@ -56,7 +56,7 @@ export function createAccount(key: string, masked: string, password: string, nam
   const salt = randomBytes(16).toString("hex");
   const now = new Date().toISOString();
   const a: Account = { key, masked, salt, hash: pw(password, salt).toString("hex"), name, room, created: now, lastLogin: now, gold: 25 };
-  saveAccount(a);
+  writeFileSync(file(key), JSON.stringify(a, null, 2), { flag: "wx", mode: 0o600 }); // exclusive: throws if the account already exists
   return a;
 }
 

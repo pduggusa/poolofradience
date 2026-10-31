@@ -116,7 +116,7 @@ function fmt(p: Player, text: string): string {
     return [...out, cur].join("\n");
   }).join("\n");
 }
-const send = (p: Player, text: string) => p.sock.write(fmt(p, text).replace(/\n/g, "\r\n") + "\r\n");
+const send = (p: Player, text: string) => p.sock.write(fmt(p, text).replace(/[\x00-\x08\x0b-\x1f\x7f]/g, "").replace(/\n/g, "\r\n") + "\r\n"); // \x01 etc. can never reach the scene channel
 
 /** Modern mode only: show a one-time hint per feature, remembered across sessions. */
 function tip(p: Player, key: string, text: string) {
@@ -977,6 +977,8 @@ const BANNER = [
   "    Unauthorized access is prohibited. All sessions are logged.",
   "    Log in with your campus e-mail address (user@school.edu).",
   "",
+  "    *** SIMULATION: no real accounts here. Use a made-up address and password. ***",
+  "",
 ].join("\r\n");
 
 /** j.smith@example.edu -> j*****h@e******.edu. Only this masked form is ever kept. */
@@ -1019,9 +1021,16 @@ createServer((sock) => {
   const show = () => sock.write(Buffer.concat([Buffer.from([255, 252, 1]), Buffer.from("\r\n")])); // IAC WONT ECHO
   sock.write(BANNER + "\r\nUsername: ");
 
+  /** Create the account, or tell the user someone else just claimed this address. Never overwrites. */
+  const create = (name: string): Account | undefined => {
+    try { return createAccount(key, who, pending, name, world.start); }
+    catch { sock.write("\r\nThat account was just created by someone else. Please reconnect and log in.\r\n"); sock.end(); return undefined; }
+  };
   const enter = (a: Account) => {
     // One session per account: a second login boots the first.
-    for (const o of players) if (o.acct.key === a.key) { send(o, "[system] Logged in from another session."); players.delete(o); o.sock.end(); }
+    for (const o of players) if (o.acct.key === a.key) { // one session per account; the newcomer inherits the live, up-to-date Account object
+      a = o.acct; save(o); send(o, "[system] Logged in from another session."); players.delete(o); o.sock.destroy();
+    }
     a.lastLogin = new Date().toISOString();
     if (isArchKey(a.key) && world.items.has("blade_of_authority") && !(a.inventory ?? []).includes("blade_of_authority")) {
       a.inventory = [...(a.inventory ?? []), "blade_of_authority"];
@@ -1075,7 +1084,7 @@ createServer((sock) => {
         pendingName = proper;
         if (world.races.size) { stage = "race"; return void sock.write(raceMenu()); }
         if (world.classes.size) { stage = "class"; return void sock.write(classMenu()); }
-        return enter(createAccount(key, who, pending, proper, world.start));
+        const made = create(proper); return made && enter(made);
       }
       case "race": {
         const q = line.trim().toLowerCase();
@@ -1085,7 +1094,7 @@ createServer((sock) => {
         pickRace = r.id;
         if (acct) acct.race = r.id;
         if (world.classes.size && !acct?.class) { stage = "class"; return void sock.write(classMenu()); }
-        if (!acct) acct = createAccount(key, who, pending, pendingName, world.start);
+        if (!acct) { const made = create(pendingName); if (!made) return; acct = made; }
         acct.race = r.id; saveAccount(acct);
         sock.write(`\r\nYou are a ${r.name}.\r\n`);
         return enter(acct);
@@ -1095,7 +1104,7 @@ createServer((sock) => {
         const list = [...world.classes.values()];
         const c = list[+q - 1] ?? list.find((x) => x.id === q || x.name.toLowerCase() === q);
         if (!c) return void sock.write("Choose by number or name: ");
-        if (!acct) acct = createAccount(key, who, pending, pendingName, world.start);
+        if (!acct) { const made = create(pendingName); if (!made) return; acct = made; }
         acct.class = c.id;
         if (pickRace) acct.race = pickRace;
         acct.inventory = [...(acct.inventory ?? []), ...c.startItems];
@@ -1107,6 +1116,7 @@ createServer((sock) => {
         return enter(acct);
       }
       case "play":
+        if (!players.has(player!)) return; // this session was booted
         if (player!.book) { bookInput(player!, line); emitScene(player!); return; }
         handle(player!, line);
         emitScene(player!);
@@ -1119,7 +1129,7 @@ createServer((sock) => {
     buf += chunk.replace(/\xff[\xfb-\xfe]./g, ""); // strip telnet negotiation
     let i: number;
     while ((i = buf.search(/\r?\n|\r/)) >= 0) {
-      const line = buf.slice(0, i);
+      const line = buf.slice(0, i).replace(/[\x00-\x08\x0b-\x1f\x7f]/g, ""); // no control chars in anything a player types
       buf = buf.slice(i).replace(/^(\r\n|\r|\n)/, "");
       line$(line);
     }
