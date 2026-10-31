@@ -1138,7 +1138,7 @@ createServer((sock) => {
     if (player && players.delete(player)) { save(player); tell(player.room, `${player.name} fades away.`); }
   });
   sock.on("error", () => sock.destroy());
-}).listen(PORT, () => console.log(`MUD listening on :${PORT}  (try: nc localhost ${PORT})`));
+}).listen(PORT, process.env.MUD_HOST ?? "127.0.0.1", () => console.log(`MUD listening on ${process.env.MUD_HOST ?? "127.0.0.1"}:${PORT}  (try: nc localhost ${PORT})`));
 
 // Flush every character on shutdown.
 for (const sig of ["SIGINT", "SIGTERM"] as const)

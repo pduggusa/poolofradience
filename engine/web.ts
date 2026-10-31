@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import { connect } from "node:net";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { networkInterfaces } from "node:os";
 import { StringDecoder } from "node:string_decoder";
 import { WebSocketServer } from "ws";
 import { loadWorld } from "./world.js";
@@ -69,4 +70,10 @@ wss.on("connection", (ws, req) => {
   });
   ws.on("close", () => sock.destroy());
 });
-http.listen(WEB_PORT, HOST, () => console.log(`web client on http://${HOST}:${WEB_PORT}  (MUD on :${MUD_PORT})`));
+http.listen(WEB_PORT, HOST, () => {
+  console.log(`web client on http://${HOST}:${WEB_PORT}  (MUD on :${MUD_PORT})`);
+  if (HOST === "0.0.0.0" || HOST === "::") { // LAN party mode: print the addresses friends can type into a phone
+    const urls = Object.values(networkInterfaces()).flat().filter((i) => i && i.family === "IPv4" && !i.internal).map((i) => `http://${i!.address}:${WEB_PORT}`);
+    console.log(`\nLAN PARTY MODE -- on phones, tablets and laptops on this network, open:\n  ${urls.join("\n  ") || "(no network interface found)"}\nLogins are fake: tell everyone to use a made-up address and password.`);
+  }
+});

@@ -1,11 +1,13 @@
 <!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>POOLVX MUD</title>
 <style>
   :root { --fg:#aaa; --bg:#000; --hi:#ff5; }
   body.c64 { --fg:#a0a0ff; --bg:#4040e0; --hi:#fff; }
-  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:15px/1.3 "Courier New",monospace; }
-  body { display:flex; flex-direction:column; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:15px/1.3 "Courier New",monospace; touch-action:manipulation; -webkit-text-size-adjust:100%; }
+  body { display:flex; flex-direction:column; height:100dvh; }
   #top { display:flex; justify-content:center; gap:12px; padding:10px 10px 0; }
   #center { display:flex; flex-direction:column; align-items:stretch; }
   #side { width:236px; background:#111; border:4px solid #555; padding:6px 8px; font-size:13px; max-height:454px; overflow-y:auto; box-sizing:border-box; }
@@ -20,12 +22,33 @@
   button { background:#333; color:#ddd; border:1px solid #777; padding:2px 8px; font:13px "Courier New",monospace; cursor:pointer; }
   button:hover { background:#555; color:#fff; } button.warn { background:#600; border-color:#f55; color:#fff; }
   a.l { color:#5ff; cursor:pointer; text-decoration:underline dotted; } a.l:hover { color:#fff; background:#044; }
+  button.on { background:#050; border-color:#5f5; color:#5f5; }
+  #dpad { display:none; grid-template-columns:repeat(3,52px); gap:4px; justify-content:center; padding:6px 0 0; }
+  #dpad button { min-height:44px; font-size:18px; padding:0; }
+  @media (pointer:coarse) { #dpad { display:grid; } }
+  #keys { position:fixed; inset:0; background:rgba(0,0,0,.8); display:flex; align-items:center; justify-content:center; z-index:10; }
+  #keys[hidden] { display:none; } #keys .box { background:#111; border:4px solid #555; padding:14px 18px; max-width:min(440px, 92vw); color:#ddd; }
+  #keys h3 { margin:0 0 6px; color:#ff5; } #keys p { margin:0 0 8px; font-size:13px; } .krow { display:flex; gap:6px; align-items:center; margin:3px 0; } .krow span { width:70px; } .krow button { min-width:96px; }
+  #keys label { display:block; margin:8px 0; font-size:13px; }
   .choice { cursor:pointer; } .choice:hover { background:#044; color:#fff; }
+  #bar span { flex:none; } #in { min-width:0; }
+  /* touch screens: bigger targets, and 16px text in the input so iOS does not zoom the page */
+  @media (pointer:coarse) { button { min-height:40px; min-width:44px; padding:4px 10px; } .item { padding:8px 6px; } a.l { padding:2px 0; } .acts button { min-height:36px; } #in { font-size:16px; } .choice { padding:5px 0; } }
+  /* phones and small tablets: stack the pack under the scene and let the log use the rest */
+  @media (max-width:900px) {
+    #top { flex-direction:column; align-items:center; gap:6px; padding:6px 6px 0; }
+    #frame { border-width:3px; } #center { width:calc(100vw - 12px); max-width:652px; }
+    #side { width:calc(100vw - 12px); max-width:652px; max-height:132px; display:grid; grid-template-columns:1fr 1fr; column-gap:10px; }
+    #side h4, #inv { grid-column:2; } #who { grid-column:1 / 3; } #vitals { grid-column:1; grid-row:2 / 4; }
+    #stats2 div { display:inline-block; margin-right:8px; font-size:12px; }
+    #term { padding:6px 10px; font-size:14px; } #bar { padding:4px 10px 10px; } #btns { gap:3px; } button { font-size:12px; padding:2px 6px; }
+  }
   #frame { border:6px solid #555; background:#000; transition:border-color .3s; }
   #frame.fight { border-color:#a00; }
   #frame.danger { border-color:#f55; animation:blink .5s steps(2) infinite; }
   @keyframes blink { 50% { border-color:#600; } }
-  canvas { width:640px; height:400px; image-rendering:pixelated; display:block; }
+  canvas { width:100%; max-width:640px; aspect-ratio:8/5; height:auto; image-rendering:pixelated; display:block; }
+  #center { width:min(652px, calc(100vw - 20px)); }
   #caption { background:#00a; color:#fff; text-align:center; padding:2px 6px; font-weight:bold; }
   #term { flex:1; overflow-y:auto; padding:8px 18px; white-space:pre-wrap; width:100%; max-width:1000px; margin:0 auto; box-sizing:border-box; }
   .tip { color:#5f5; } .quest { color:#ff5; } .danger { color:#f55; font-weight:bold; } .room { color:var(--hi); font-weight:bold; }
@@ -37,15 +60,16 @@
   <div id="center">
     <div id="frame"><canvas id="scene" width="320" height="200"></canvas><div id="caption">POOLVX -- connecting...</div></div>
     <div id="btns"></div>
+    <div id="dpad"></div>
   </div>
   <div id="side"><div id="who">Not logged in</div><div id="vitals"></div><h4>PACK</h4><div id="inv">(empty)</div></div>
 </div>
 <div id="term"></div>
-<div id="bar"><span>&gt;</span><input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus></div>
+<div id="bar"><span>&gt;</span><input id="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" autofocus></div>
 <script type="module">
 const art = await (await fetch("/art.json")).json();
 const PAL = art.palette;
-const cv = document.getElementById("scene"), g = cv.getContext("2d");
+const cv = document.getElementById("scene"), g = cv.getContext("2d"), input = document.getElementById("in");
 g.imageSmoothingEnabled = false;
 const W = 320, H = 200, BX0 = 88, BY0 = 50, BX1 = 232, BY1 = 134; // the back wall rectangle; everything converges here
 
@@ -225,7 +249,9 @@ function renderMe(me) {
   const num = (x) => (Number.isFinite(+x) ? +x : 0);
   const bar = (id, label, val, max) => { const d = document.createElement("div"); d.className = "bar"; const i = document.createElement("i"); i.id = id; i.style.width = Math.max(0, Math.min(100, (num(val) / Math.max(1, num(max))) * 100)) + "%"; const b = document.createElement("b"); b.textContent = `${label} ${num(val)}/${num(max)}`; d.append(i, b); v.appendChild(d); };
   bar("hpbar", "HP", me.hp, me.hpMax); bar("mpbar", "MP", me.mp, me.mpMax); bar("xpbar", "XP", me.xp, me.xpNext);
-  const st = document.createElement("div"); st.id = "stats2"; st.textContent = `Food: ${String(me.food)}\nGold: ${num(me.gold)}\nLoad: ${num(me.weight)}/${num(me.cap)}`; st.style.whiteSpace = "pre"; v.appendChild(st);
+  const st = document.createElement("div"); st.id = "stats2";
+  for (const t of [`Food: ${String(me.food)}`, `Gold: ${num(me.gold)}`, `Load: ${num(me.weight)}/${num(me.cap)}`]) { const d = document.createElement("div"); d.textContent = t; st.appendChild(d); }
+  v.appendChild(st);
   const inv = document.getElementById("inv"); inv.textContent = "";
   if (!me.inv.length) inv.textContent = "(empty)";
   me.inv.forEach((it, idx) => {
@@ -246,12 +272,68 @@ function renderMe(me) {
 }
 const BTNS = [["Look", "look"], ["Pack", "i"], ["Score", "score"], ["Quests", "quests"], ["Spells", "spells"], ["Loot", "loot"], ["Corpse", "corpse"], ["Flee", "flee", "flee"], ["Who", "who"], ["Help", "help"]];
 for (const [label, cmd, id] of BTNS) { const b = document.createElement("button"); b.textContent = label; if (id) b.id = id; b.onclick = () => send(cmd); document.getElementById("btns").appendChild(b); }
+// ---------- WASD pad mode (Tab toggles) and the touch D-pad ----------
+let pad = false;
+const padBtn = document.createElement("button"); padBtn.title = "Tab: WASD walk, Q/E up/down, Space look, F fight, R flee, Enter to type again"; padBtn.textContent = "WASD";
+padBtn.onclick = () => setPad(!pad); document.getElementById("btns").appendChild(padBtn);
+function setPad(on) { pad = on; padBtn.classList.toggle("on", on); padBtn.textContent = on ? "WASD ON" : "WASD"; if (on) input.blur(); else input.focus(); }
+// Key bindings (rebindable in the Keys panel, saved in this browser). Two keys per action.
+const ACTIONS = [["n", "North"], ["s", "South"], ["e", "East"], ["w", "West"], ["u", "Up"], ["d", "Down"], ["look", "Look"], ["@attack", "Fight"], ["flee", "Flee"]];
+const DEFAULTS = { n: ["w", "arrowup"], s: ["s", "arrowdown"], e: ["d", "arrowright"], w: ["a", "arrowleft"], u: ["q", ""], d: ["e", ""], look: [" ", ""], "@attack": ["f", ""], flee: ["r", ""] };
+let cfg = { keys: structuredClone(DEFAULTS), arrowsAlways: true };
+try { const saved = JSON.parse(localStorage.getItem("poolvx.keys") || "null"); if (saved?.keys) cfg = { keys: { ...DEFAULTS, ...saved.keys }, arrowsAlways: saved.arrowsAlways !== false }; } catch { /* use defaults */ }
+const saveCfg = () => { try { localStorage.setItem("poolvx.keys", JSON.stringify(cfg)); } catch { /* private mode */ } };
+const lookup = (k) => Object.entries(cfg.keys).find(([, ks]) => ks.includes(k))?.[0];
+function doAction(c) { if (c === "@attack") { const r = [...regions].reverse().find((x) => x.cmd.startsWith("attack ")); if (r) send(r.cmd); } else send(c); }
+let capturing = null;
+document.addEventListener("keydown", (e) => {
+  if (capturing) return; // the capture handler below owns the keyboard while rebinding
+  if (e.key === "Tab") { e.preventDefault(); setPad(!pad); return; }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (pad) {
+    if (e.key === "Enter" || e.key === "Escape") { e.preventDefault(); setPad(false); return; }
+    const c = lookup(k); if (c) { e.preventDefault(); doAction(c); }
+  } else if (cfg.arrowsAlways && !e.shiftKey && k.startsWith("arrow") && document.activeElement === input && input.value === "") {
+    const c = lookup(k); if (c) { e.preventDefault(); doAction(c); }
+  }
+});
+// ---------- Keys panel ----------
+const dlg = document.createElement("div"); dlg.id = "keys"; dlg.hidden = true; document.body.appendChild(dlg);
+const keyName = (k) => (k === " " ? "Space" : k ? k.replace("arrow", "Arrow ") : "-");
+function renderKeys() {
+  dlg.textContent = ""; const box = document.createElement("div"); box.className = "box";
+  const h = document.createElement("h3"); h.textContent = "Key setup"; box.appendChild(h);
+  const p = document.createElement("p"); p.textContent = "Tab toggles WASD pad mode; Enter or Esc returns to typing. Click a key to rebind it (Esc while waiting clears the slot)."; box.appendChild(p);
+  for (const [act, label] of ACTIONS) {
+    const row = document.createElement("div"); row.className = "krow"; const l = document.createElement("span"); l.textContent = label; row.appendChild(l);
+    for (const slot of [0, 1]) { const b = document.createElement("button"); b.textContent = capturing && capturing.act === act && capturing.slot === slot ? "press a key..." : keyName(cfg.keys[act][slot]); b.onclick = () => { capturing = { act, slot }; renderKeys(); }; row.appendChild(b); }
+    box.appendChild(row);
+  }
+  const lab = document.createElement("label"); const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = cfg.arrowsAlways; cb.onchange = () => { cfg.arrowsAlways = cb.checked; saveCfg(); };
+  lab.append(cb, " Arrow keys walk whenever the text box is empty (Shift+Up/Down recalls history)"); box.appendChild(lab);
+  const rb = document.createElement("button"); rb.textContent = "Reset to defaults"; rb.onclick = () => { cfg = { keys: structuredClone(DEFAULTS), arrowsAlways: true }; saveCfg(); renderKeys(); };
+  const cl = document.createElement("button"); cl.textContent = "Close"; cl.onclick = () => { capturing = null; dlg.hidden = true; input.focus(); };
+  const bar = document.createElement("div"); bar.className = "krow"; bar.append(rb, cl); box.appendChild(bar); dlg.appendChild(box);
+}
+window.addEventListener("keydown", (e) => { // capture phase: swallow the next key and bind it
+  if (!capturing) return; e.preventDefault(); e.stopPropagation();
+  if (["Shift", "Control", "Alt", "Meta", "Tab", "Enter"].includes(e.key)) return;
+  const { act, slot } = capturing, k = e.key === "Escape" ? "" : e.key.toLowerCase();
+  if (k) for (const [a, ks] of Object.entries(cfg.keys)) ks.forEach((x, i) => { if (x === k && !(a === act && i === slot)) cfg.keys[a][i] = ""; }); // one key, one action
+  cfg.keys[act][slot] = k; capturing = null; saveCfg(); renderKeys();
+}, true);
+const keysBtn = document.createElement("button"); keysBtn.textContent = "Keys"; keysBtn.onclick = () => { dlg.hidden = false; renderKeys(); }; document.getElementById("btns").appendChild(keysBtn);
+input.addEventListener("focus", () => { if (pad) setPad(false); });
+for (const [label, cmd, col] of [["\u25B2\u2191", "u", 1], ["\u25B2", "n", 2], ["\u25BC\u2193", "d", 3], ["\u25C0", "w", 1], ["\u25BC", "s", 2], ["\u25B6", "e", 3]]) {
+  const b = document.createElement("button"); b.textContent = label; b.style.gridColumn = col; b.title = { u: "up", d: "down", n: "north", s: "south", e: "east", w: "west" }[cmd]; b.onclick = () => send(cmd); document.getElementById("dpad").appendChild(b);
+}
 cv.addEventListener("mousemove", (e) => { const r = hit(e); cv.style.cursor = r ? "pointer" : "default"; document.getElementById("caption").textContent = r ? "\u25B6 " + r.label : baseCaption; });
 cv.addEventListener("mouseleave", () => { document.getElementById("caption").textContent = baseCaption; });
 cv.addEventListener("click", (e) => { const r = hit(e); if (r) send(r.cmd); });
 
 // ---------- terminal ----------
-const term = document.getElementById("term"), input = document.getElementById("in");
+const term = document.getElementById("term");
 const lines = []; let partial = "", partialEl = document.createElement("div"); term.appendChild(partialEl);
 function cls(t) { return t.startsWith("[tip]") ? "tip" : t.startsWith("[quest]") || t.startsWith("***") ? "quest" : t.startsWith("[DANGER]") || t.includes("DEATH'S DOOR") || t.includes("You have died") ? "danger" : t.startsWith("==") ? "room" : t.startsWith("<HP") ? "prompt" : t.startsWith("[system]") ? "sys" : ""; }
 const link = (text, cmd) => { const a = document.createElement("a"); a.className = "l"; a.textContent = text; a.onclick = () => send(cmd); return a; };
@@ -286,9 +368,9 @@ input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const v = input.value; if (input.type !== "password") { addLine("> " + v, "echo"); if (v.trim()) { hist.push(v); hi = hist.length; } } else addLine("> ********", "echo");
     ws.send(JSON.stringify({ t: "in", s: v })); input.value = "";
-  } else if (e.key === "ArrowUp" && hi > 0) { input.value = hist[--hi]; e.preventDefault(); }
-  else if (e.key === "ArrowDown") { input.value = hi < hist.length - 1 ? hist[++hi] : ((hi = hist.length), ""); e.preventDefault(); }
+  } else if (e.key === "ArrowUp" && hi > 0 && (e.shiftKey || !cfg.arrowsAlways || input.value)) { input.value = hist[--hi]; e.preventDefault(); }
+  else if (e.key === "ArrowDown" && (e.shiftKey || !cfg.arrowsAlways || input.value)) { input.value = hi < hist.length - 1 ? hist[++hi] : ((hi = hist.length), ""); e.preventDefault(); }
 });
-document.body.addEventListener("click", () => input.focus());
+document.body.addEventListener("click", () => { if (!pad) input.focus(); });
 THEMES.village({ exits: ["n"], mobs: [], npcs: [], items: 0, hp: 100 }); // something pretty before you log in
 </script>

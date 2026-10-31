@@ -28,6 +28,21 @@ To make yourself an arch wizard (instant-kill blade, can approve other wizards),
 npm run arch -- you@school.edu
 ```
 
+### LAN party (phones and tablets welcome)
+
+```sh
+npm run lan        # serves the browser client to your whole network and prints the URL
+```
+
+Everyone on the same Wi-Fi opens the printed address (e.g. `http://192.168.1.20:8080`) on a phone, tablet or laptop. The client is touch-friendly: tap walls to walk, tap monsters to fight, tap people to talk. Telnet players can join on port 4000. By default everything listens on localhost only.
+
+### Controls
+
+- **Mouse / touch:** tap the walls to walk, monsters to fight, people to talk, the floor glints to loot. Exits and numbered replies in the text are links.
+- **Keyboard:** the arrow keys walk whenever the text box is empty (Shift+Up/Down recalls command history). Press **Tab** for WASD pad mode: W/A/S/D walk, Q/E go up/down, Space looks, F fights, R flees, Enter or Esc goes back to typing.
+- **Phones and tablets:** an on-screen D-pad appears on touch devices.
+- **Rebind everything** with the **Keys** button (saved in your browser).
+
 ## Everything is data
 
 The game is a pack of JSON files in `packs/base/`: monsters, items, areas, quests, spells, classes, races, gamebooks, a glossary, and pixel art (text maps in the EGA palette). Add a folder under `packs/` and it loads; edit a file while the server runs and it hot-reloads. A broken edit is rejected and the old world stays up.
