@@ -34,7 +34,7 @@ npm run arch -- you@school.edu
 npm run lan        # serves the browser client to your whole network and prints the URL
 ```
 
-Everyone on the same Wi-Fi opens the printed address (e.g. `http://192.168.1.20:8080`) on a phone, tablet or laptop. The client is touch-friendly: tap walls to walk, tap monsters to fight, tap people to talk. Telnet players can join on port 4000. By default everything listens on localhost only.
+Everyone on the same Wi-Fi opens the printed address (e.g. `http://192.168.1.20:8080`) on a phone, tablet or laptop. The client is touch-friendly: tap walls to walk, tap monsters to fight, tap people to talk. Only the web page is opened to the network; the raw telnet port stays on localhost. If you really want telnet players on the LAN too, use `npm run lan:telnet` (passwords cross the network in plain text there, so keep it to made-up logins). By default everything listens on localhost only.
 
 ### Controls
 

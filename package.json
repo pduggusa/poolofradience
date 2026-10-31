@@ -9,7 +9,8 @@
     "arch": "tsx tools/arch.ts",
     "art:preview": "tsx tools/art-preview.ts",
     "web": "tsx engine/web.ts",
-    "lan": "WEB_HOST=0.0.0.0 MUD_HOST=0.0.0.0 tsx engine/web.ts"
+    "lan": "WEB_HOST=0.0.0.0 tsx engine/web.ts",
+    "lan:telnet": "WEB_HOST=0.0.0.0 MUD_HOST=0.0.0.0 tsx engine/web.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
